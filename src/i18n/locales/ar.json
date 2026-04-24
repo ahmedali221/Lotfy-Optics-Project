@@ -1,0 +1,145 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "about": "من نحن",
+    "products": "المنتجات",
+    "sunglasses": "نظارات شمسية",
+    "eyeglasses": "نظارات طبية",
+    "artificial": "عيون صناعية بالبصمة",
+    "filters": "فلاتر ضوئية (لعمى الألوان)",
+    "clinics": "العيادات",
+    "branches": "الفروع",
+    "contact": "اتصل بنا",
+    "articles": "المقالات"
+  },
+  "hero": {
+    "slide1": {
+      "title": "صيفك أحلى مع أحدث تشكيلات النظارات الشمسية",
+      "subtitle": "اكتشف مجموعتنا الحصرية من النظارات الشمسية العصرية"
+    },
+    "slide2": {
+      "title": "عيادات متخصصة بأحدث الأجهزة",
+      "subtitle": "اكتشف عالم الرؤية الواضحة مع أطبائنا المتخصصين"
+    },
+    "slide3": {
+      "title": "نظارات الأطفال - تصاميم تناسب عمرهم",
+      "subtitle": "نظارات آمنة ومريحة لأطفالك مع أفضل الخامات"
+    },
+    "cta": "تسوق الآن"
+  },
+  "category": {
+    "sunglasses": "نظارات شمسية",
+    "sunglasses_desc": "تصفح المجموعة",
+    "eyeglasses": "نظارات طبية",
+    "eyeglasses_desc": "تصفح المجموعة",
+    "artificial": "عيون صناعية بالبصمة",
+    "artificial_desc": "استفسر الآن",
+    "filters": "فلاتر ضوئية (لعمى الألوان)",
+    "filters_desc": "تصفح المجموعة"
+  },
+  "products": {
+    "showing": "عرض",
+    "of": "من",
+    "products": "منتج",
+    "noResults": "لا توجد منتجات تطابق معايير البحث",
+    "addToCart": "أضف للسلة",
+    "quickView": "عرض سريع",
+    "details": "التفاصيل",
+    "price": "السعر",
+    "category": "الفئة",
+    "rating": "التقييم"
+  },
+  "filter": {
+    "search": "ابحث عن المنتجات...",
+    "category": "الفئة",
+    "allCategories": "جميع الفئات",
+    "sortBy": "الترتيب حسب",
+    "sortName": "الاسم أ-ي",
+    "sortNameDesc": "الاسم ي-أ",
+    "sortPriceLow": "السعر من الأقل للأعلى",
+    "sortPriceHigh": "السعر من الأعلى للأقل",
+    "sortRatingLow": "التقييم من الأقل للأعلى",
+    "sortRatingHigh": "التقييم من الأعلى للأقل",
+    "gender": "الجنس",
+    "male": "رجالي",
+    "female": "نسائي",
+    "kids": "أطفال",
+    "unisex": "للجنسين",
+    "priceRange": "السعر",
+    "brand": "الماركة",
+    "frameShape": "شكل الإطار",
+    "frameColor": "لون الإطار",
+    "lensType": "نوع العدسة",
+    "applyFilters": "تطبيق الفلاتر",
+    "clearFilters": "مسح الفلاتر"
+  },
+  "clinics": {
+    "title": "مركز لطفي للبصريات الطبي",
+    "subtitle": "رؤيتك أمانتنا",
+    "services": "خدماتنا الطبية",
+    "bookAppointment": "احجز موعدك الآن",
+    "service": {
+      "refraction": "فحص قياس النظر",
+      "refraction_desc": "فحص دقيق بأحدث الأجهزة",
+      "retina": "فحص قاع العين",
+      "retina_desc": "Retina Scan",
+      "pressure": "قياس ضغط العين",
+      "pressure_desc": "Tonometry",
+      "contacts": "عدسات لاصقة",
+      "contacts_desc": "تركيب وفحص",
+      "amblyopia": "علاج كسل العين",
+      "amblyopia_desc": "للأطفال",
+      "dryeye": "استشارات جفاف العين",
+      "dryeye_desc": "علاج متخصص"
+    }
+  },
+  "appointment": {
+    "title": "حجز موعد",
+    "name": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "email": "البريد الإلكتروني",
+    "service": "اختر الخدمة",
+    "date": "التاريخ المفضل",
+    "time": "الوقت المفضل",
+    "branch": "فرع الزيارة",
+    "branch_ferial": "فريال",
+    "branch_hoqoqyin": "الحقوقيين",
+    "submit": "احجز موعدي الآن",
+    "success": "تم حجز موعدك بنجاح"
+  },
+  "branches": {
+    "title": "فروعنا",
+    "ferial": "فرع فريال",
+    "hoqoqyin": "فرع الحقوقيين",
+    "address": "العنوان",
+    "hours": "مواعيد العمل",
+    "phone": "رقم الهاتف",
+    "directions": "كيفية الوصول",
+    "getDirections": "الاتجاهات"
+  },
+  "footer": {
+    "about": "عن لطفي للبصريات",
+    "about_text": "محلات لطفي للبصريات - وجهتك المثالية للنظارات والعناية بالعيون في أسيوط",
+    "quickLinks": "روابط سريعة",
+    "services": "خدماتنا",
+    "contact": "تواصل معنا",
+    "followUs": "تابعنا",
+    "rights": "جميع الحقوق محفوظة"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "readMore": "اقرأ المزيد",
+    "viewAll": "عرض الكل",
+    "learnMore": "اعرف المزيد",
+    "contactUs": "اتصل بنا",
+    "close": "إغلاق",
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "search": "بحث",
+    "filter": "تصفية",
+    "sort": "ترتيب"
+  }
+}

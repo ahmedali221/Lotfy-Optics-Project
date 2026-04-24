@@ -1,0 +1,145 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "products": "Products",
+    "sunglasses": "Sunglasses",
+    "eyeglasses": "Eyeglasses",
+    "artificial": "Artificial Eyes",
+    "filters": "Light Filters (Color Blindness)",
+    "clinics": "Medical Clinics",
+    "branches": "Branches",
+    "contact": "Contact Us",
+    "articles": "Articles"
+  },
+  "hero": {
+    "slide1": {
+      "title": "Your Summer Looks Better with Our Latest Sunglasses",
+      "subtitle": "Discover our exclusive collection of trendy sunglasses"
+    },
+    "slide2": {
+      "title": "Specialized Clinics with Latest Equipment",
+      "subtitle": "Discover the world of clear vision with our specialized doctors"
+    },
+    "slide3": {
+      "title": "Kids Eyewear - Designs That Suit Their Age",
+      "subtitle": "Safe and comfortable glasses for your kids with the best materials"
+    },
+    "cta": "Shop Now"
+  },
+  "category": {
+    "sunglasses": "Sunglasses",
+    "sunglasses_desc": "Browse Collection",
+    "eyeglasses": "Eyeglasses",
+    "eyeglasses_desc": "Browse Collection",
+    "artificial": "Artificial Eyes",
+    "artificial_desc": "Inquire Now",
+    "filters": "Light Filters (Color Blindness)",
+    "filters_desc": "Browse Collection"
+  },
+  "products": {
+    "showing": "Showing",
+    "of": "of",
+    "products": "products",
+    "noResults": "No products found matching your criteria",
+    "addToCart": "Add to Cart",
+    "quickView": "Quick View",
+    "details": "Details",
+    "price": "Price",
+    "category": "Category",
+    "rating": "Rating"
+  },
+  "filter": {
+    "search": "Search products...",
+    "category": "Category",
+    "allCategories": "All Categories",
+    "sortBy": "Sort By",
+    "sortName": "Name A-Z",
+    "sortNameDesc": "Name Z-A",
+    "sortPriceLow": "Price Low to High",
+    "sortPriceHigh": "Price High to Low",
+    "sortRatingLow": "Rating Low to High",
+    "sortRatingHigh": "Rating High to Low",
+    "gender": "Gender",
+    "male": "Men",
+    "female": "Women",
+    "kids": "Kids",
+    "unisex": "Unisex",
+    "priceRange": "Price Range",
+    "brand": "Brand",
+    "frameShape": "Frame Shape",
+    "frameColor": "Frame Color",
+    "lensType": "Lens Type",
+    "applyFilters": "Apply Filters",
+    "clearFilters": "Clear Filters"
+  },
+  "clinics": {
+    "title": "LOTFY OPTICAL Medical Center",
+    "subtitle": "Your Vision is Our Trust",
+    "services": "Our Medical Services",
+    "bookAppointment": "Book Your Appointment",
+    "service": {
+      "refraction": "Vision Test",
+      "refraction_desc": "Accurate test with latest equipment",
+      "retina": "Retina Scan",
+      "retina_desc": "Comprehensive eye examination",
+      "pressure": "Eye Pressure Test",
+      "pressure_desc": "Tonometry",
+      "contacts": "Contact Lenses",
+      "contacts_desc": "Fitting and examination",
+      "amblyopia": "Lazy Eye Treatment",
+      "amblyopia_desc": "For children",
+      "dryeye": "Dry Eye Consultation",
+      "dryeye_desc": "Specialized treatment"
+    }
+  },
+  "appointment": {
+    "title": "Book Appointment",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "email": "Email",
+    "service": "Select Service",
+    "date": "Preferred Date",
+    "time": "Preferred Time",
+    "branch": "Branch",
+    "branch_ferial": "Ferial",
+    "branch_hoqoqyin": "Hoqoqyin",
+    "submit": "Book Now",
+    "success": "Appointment booked successfully"
+  },
+  "branches": {
+    "title": "Our Branches",
+    "ferial": "Ferial Branch",
+    "hoqoqyin": "Hoqoqyin Branch",
+    "address": "Address",
+    "hours": "Working Hours",
+    "phone": "Phone",
+    "directions": "How to Get There",
+    "getDirections": "Get Directions"
+  },
+  "footer": {
+    "about": "About LOTFY OPTICAL",
+    "about_text": "LOTFY OPTICAL - Your ideal destination for eyewear and eye care in Assiut",
+    "quickLinks": "Quick Links",
+    "services": "Our Services",
+    "contact": "Contact Us",
+    "followUs": "Follow Us",
+    "rights": "All Rights Reserved"
+  },
+  "common": {
+    "loading": "Loading...",
+    "readMore": "Read More",
+    "viewAll": "View All",
+    "learnMore": "Learn More",
+    "contactUs": "Contact Us",
+    "close": "Close",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  }
+}
