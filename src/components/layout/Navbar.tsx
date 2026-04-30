@@ -2,56 +2,54 @@ import { Link } from 'react-router';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { ShoppingCart, Heart, Globe, Menu, X, ChevronDown, Sun, Glasses, Rainbow, Eye, Search } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { ShoppingCart, Heart, Menu, X, ChevronDown, Sun, Glasses, Search, User, LogOut, LogIn } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { AuthModal } from '../auth/AuthModal';
 import logo from 'figma:asset/6cf34647e4fbb686586e5bf4df6ca696eb0c53aa.png';
 
 export function Navbar() {
-  const { language, toggleLanguage, t } = useLanguage();
+  const { language, t } = useLanguage();
   const { getItemCount } = useCart();
   const { items: wishlistItems } = useWishlist();
+  const { user, isAuthenticated, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsProductsDropdownOpen(false);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
     }
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const productCategories = [
-    { 
-      path: '/sunglasses', 
+    {
+      path: '/sunglasses',
       label: t('nav.sunglasses'),
       icon: Sun,
       color: 'text-yellow-600'
     },
-    { 
-      path: '/eyeglasses', 
+    {
+      path: '/eyeglasses',
       label: t('nav.eyeglasses'),
       icon: Glasses,
       color: 'text-blue-600'
     },
-    { 
-      path: '/light-filters', 
-      label: t('nav.filters'),
-      icon: Rainbow,
-      color: 'text-purple-600'
-    },
-    { 
-      path: '/artificial-eyes', 
-      label: t('nav.artificial'),
-      icon: Eye,
-      color: 'text-green-600'
-    },
+    // No API category — API only supports: frame, lens, accessory
+    // { path: '/light-filters', label: t('nav.filters'), icon: Rainbow, color: 'text-purple-600' },
+    // { path: '/artificial-eyes', label: t('nav.artificial'), icon: Eye, color: 'text-green-600' },
   ];
 
   const mainNavLinks = [
@@ -60,8 +58,9 @@ export function Navbar() {
   ];
 
   const otherNavLinks = [
-    { path: '/clinics', label: t('nav.clinics') },
-    { path: '/articles', label: t('nav.articles') },
+    // No API endpoint — commented until backend adds clinic/article data
+    // { path: '/clinics', label: t('nav.clinics') },
+    // { path: '/articles', label: t('nav.articles') },
     { path: '/contact', label: t('nav.contact') },
   ];
 
@@ -138,7 +137,7 @@ export function Navbar() {
           </div>
 
           {/* Right Side Icons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Search Icon */}
             <button
               className="hidden md:flex p-2 text-secondary hover:text-primary transition-colors duration-200"
@@ -154,9 +153,11 @@ export function Navbar() {
               aria-label={t('nav.cart')}
             >
               <ShoppingCart className="w-6 h-6" />
-              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {getItemCount()}
-              </span>
+              {getItemCount() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {getItemCount()}
+                </span>
+              )}
             </Link>
 
             {/* Wishlist Icon */}
@@ -166,20 +167,57 @@ export function Navbar() {
               aria-label={t('nav.wishlist')}
             >
               <Heart className="w-6 h-6" />
-              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {wishlistItems.length}
-              </span>
+              {wishlistItems.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {wishlistItems.length}
+                </span>
+              )}
             </Link>
 
-            {/* Language Switcher */}
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center gap-2 px-3 py-2 rounded-md text-secondary hover:text-primary hover:bg-background transition-colors duration-200"
-              aria-label="Toggle Language"
-            >
-              <Globe className="w-5 h-5" />
-              <span className="hidden sm:inline text-sm font-medium">{language === 'ar' ? 'EN' : 'عربي'}</span>
-            </button>
+            {/* Auth — Desktop */}
+            <div className="hidden lg:block">
+              {isAuthenticated && user ? (
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border hover:border-primary hover:text-primary transition-colors duration-200 text-sm font-medium text-secondary"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="max-w-[100px] truncate">{user.name.split(' ')[0]}</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isUserMenuOpen && (
+                    <div
+                      className="absolute top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-border z-50"
+                      style={language === 'ar' ? { right: 0 } : { left: 0 }}
+                    >
+                      <div className="px-4 py-3 border-b border-border">
+                        <p className="text-sm font-semibold text-secondary truncate">{user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                      <button
+                        onClick={() => { logout(); setIsUserMenuOpen(false); }}
+                        className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-b-xl transition-colors duration-200"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        {language === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-xl text-sm font-medium transition-colors duration-200 shadow-sm"
+                >
+                  <LogIn className="w-4 h-4" />
+                  {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+                </button>
+              )}
+            </div>
 
             {/* Mobile Menu Button */}
             <button
@@ -190,6 +228,11 @@ export function Navbar() {
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
+
+          {/* Auth Modal */}
+          {showAuthModal && (
+            <AuthModal onClose={() => setShowAuthModal(false)} />
+          )}
         </div>
 
         {/* Mobile Navigation */}
@@ -254,6 +297,38 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+
+              {/* Auth — Mobile */}
+              <div className="border-t border-border pt-3 mt-1">
+                {isAuthenticated && user ? (
+                  <>
+                    <div className="flex items-center gap-3 px-4 py-2 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-secondary truncate">{user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => { logout(); setIsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors duration-200"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      {language === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => { setShowAuthModal(true); setIsMenuOpen(false); }}
+                    className="flex items-center gap-2 w-full px-4 py-2 rounded-md text-sm font-medium text-primary hover:bg-background transition-colors duration-200"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    {language === 'ar' ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Register'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}

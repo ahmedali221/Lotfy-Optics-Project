@@ -1,3 +1,4 @@
+import React from 'react';
 import { useParams, Link } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { ArrowLeft, Clock, Calendar, Tag, Share2, Facebook, Twitter, Linkedin, Eye, TrendingUp } from 'lucide-react';
@@ -1654,30 +1655,6 @@ export function ArticleDetailPage() {
                       </Link>
                     ))}
                   </div>
-                </div>
-
-                {/* CTA Box */}
-                <div className="bg-gradient-to-br from-primary to-secondary rounded-2xl shadow-lg p-8 text-white text-center">
-                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Calendar className="w-8 h-8" />
-                  </div>
-
-                  <h3 className="text-xl font-bold mb-2">
-                    {language === 'ar' ? 'احجز فحصاً مجانياً' : 'Book a Free Exam'}
-                  </h3>
-
-                  <p className="text-white/90 text-sm mb-6">
-                    {language === 'ar'
-                      ? 'احجز موعدك الآن واحصل على استشارة مجانية'
-                      : 'Book your appointment now and get a free consultation'}
-                  </p>
-
-                  <Link
-                    to="/clinics"
-                    className="inline-block bg-white text-primary hover:bg-background px-6 py-3 rounded-lg font-medium transition-colors duration-200"
-                  >
-                    {language === 'ar' ? 'احجز الآن' : 'Book Now'}
-                  </Link>
                 </div>
 
                 {/* Categories */}

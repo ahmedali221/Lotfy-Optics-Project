@@ -1,17 +1,23 @@
+import { useState, useEffect } from 'react';
 import { HeroSlider } from '../components/home/HeroSlider';
 import { CategoryGrid } from '../components/home/CategoryGrid';
 import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'react-router';
-import { ProductCard } from '../components/products/ProductCard';
-import { products } from '../data/products';
+import { ApiProductCard } from '../components/products/ApiProductCard';
+import { ApiProduct } from '../types/api';
 import { Calendar, Shield, Award, Truck, ArrowRight, Clock, BadgeCheck, Star } from 'lucide-react';
 import pixxLogo from 'figma:asset/2670385029b046e1a151f095f484f8d2909ea64f.png';
+import api from '../lib/axios';
 
 export function HomePage() {
   const { t, language } = useLanguage();
+  const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
 
-  // Get 8 featured products
-  const featuredProducts = products.slice(0, 8);
+  useEffect(() => {
+    api.get('/api/catalog/products/', { params: { is_active: 'true', page_size: 8, ordering: '-id' } })
+      .then(({ data }) => setFeaturedProducts(data.results ?? data))
+      .catch(() => {});
+  }, []);
 
   const features = [
     {
@@ -122,9 +128,18 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {featuredProducts.length > 0
+              ? featuredProducts.map(p => <ApiProductCard key={p.id} product={p} />)
+              : Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
+                    <div className="aspect-square bg-gray-100" />
+                    <div className="p-4 space-y-2">
+                      <div className="h-4 bg-gray-100 rounded w-3/4" />
+                      <div className="h-3 bg-gray-100 rounded w-1/2" />
+                    </div>
+                  </div>
+                ))
+            }
           </div>
 
           <div className="text-center">

@@ -10,13 +10,16 @@ export function Footer() {
     { path: '/', label: t('nav.home') },
     { path: '/sunglasses', label: t('nav.sunglasses') },
     { path: '/eyeglasses', label: t('nav.eyeglasses') },
-    { path: '/clinics', label: t('nav.clinics') },
+    // No API endpoint — commented until backend adds clinic data
+    // { path: '/clinics', label: t('nav.clinics') },
   ];
 
   const services = [
-    { path: '/artificial-eyes', label: t('nav.artificial') },
-    { path: '/light-filters', label: t('nav.filters') },
-    { path: '/branches', label: t('nav.branches') },
+    // No API category — API only supports: frame, lens, accessory
+    // { path: '/artificial-eyes', label: t('nav.artificial') },
+    // { path: '/light-filters', label: t('nav.filters') },
+    // No API endpoint — commented until backend adds branches data
+    // { path: '/branches', label: t('nav.branches') },
     { path: '/contact', label: t('nav.contact') },
   ];
 

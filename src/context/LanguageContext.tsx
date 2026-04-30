@@ -22,9 +22,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     i18n.changeLanguage(language);
   }, [language]);
 
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'ar' ? 'en' : 'ar');
-  };
+  // Language is locked to Arabic
+  const toggleLanguage = () => {};
 
   return (
     <LanguageContext.Provider value={{ language, toggleLanguage, t }}>

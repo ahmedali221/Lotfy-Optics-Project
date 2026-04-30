@@ -1,77 +1,58 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Product } from '../data/products';
+import { ApiProduct } from '../types/api';
 
 interface WishlistContextType {
-  items: Product[];
-  addItem: (product: Product) => void;
-  removeItem: (productId: string) => void;
-  isInWishlist: (productId: string) => boolean;
-  toggleItem: (product: Product) => void;
+  items: ApiProduct[];
+  addItem: (product: ApiProduct) => void;
+  removeItem: (productId: number) => void;
+  isInWishlist: (productId: number) => boolean;
+  toggleItem: (product: ApiProduct) => void;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<Product[]>(() => {
-    // Load wishlist from localStorage
+  const [items, setItems] = useState<ApiProduct[]>(() => {
     if (typeof window !== 'undefined') {
-      const savedWishlist = localStorage.getItem('lotfy-wishlist');
-      return savedWishlist ? JSON.parse(savedWishlist) : [];
+      try {
+        const saved = localStorage.getItem('lotfy-wishlist-v2');
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
+      }
     }
     return [];
   });
 
-  // Save wishlist to localStorage whenever it changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('lotfy-wishlist', JSON.stringify(items));
+      localStorage.setItem('lotfy-wishlist-v2', JSON.stringify(items));
     }
   }, [items]);
 
-  const addItem = (product: Product) => {
-    setItems((prevItems) => {
-      if (!prevItems.find((item) => item.id === product.id)) {
-        return [...prevItems, product];
-      }
-      return prevItems;
-    });
+  const addItem = (product: ApiProduct) => {
+    setItems(prev => prev.find(i => i.id === product.id) ? prev : [...prev, product]);
   };
 
-  const removeItem = (productId: string) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+  const removeItem = (productId: number) => {
+    setItems(prev => prev.filter(i => i.id !== productId));
   };
 
-  const isInWishlist = (productId: string) => {
-    return items.some((item) => item.id === productId);
-  };
+  const isInWishlist = (productId: number) => items.some(i => i.id === productId);
 
-  const toggleItem = (product: Product) => {
-    if (isInWishlist(product.id)) {
-      removeItem(product.id);
-    } else {
-      addItem(product);
-    }
+  const toggleItem = (product: ApiProduct) => {
+    isInWishlist(product.id) ? removeItem(product.id) : addItem(product);
   };
 
   return (
-    <WishlistContext.Provider
-      value={{
-        items,
-        addItem,
-        removeItem,
-        isInWishlist,
-        toggleItem,
-      }}
-    >
+    <WishlistContext.Provider value={{ items, addItem, removeItem, isInWishlist, toggleItem }}>
       {children}
     </WishlistContext.Provider>
   );
 }
 
 export function useWishlist() {
-  const context = useContext(WishlistContext);
-  if (context === undefined) {
-    throw new Error('useWishlist must be used within a WishlistProvider');
-  }
-  return context;
+  const ctx = useContext(WishlistContext);
+  if (!ctx) throw new Error('useWishlist must be within WishlistProvider');
+  return ctx;
 }

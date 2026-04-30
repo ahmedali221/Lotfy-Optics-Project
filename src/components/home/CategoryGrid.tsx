@@ -4,32 +4,32 @@ import { ArrowRight } from 'lucide-react';
 
 const categories = [
   {
-    titleKey: 'category.sunglasses',
-    descKey: 'category.sunglasses.desc',
+    title: 'نظارات شمسية',
+    desc: 'تشكيلة واسعة من النظارات الشمسية العصرية التي توفر حماية كاملة وتناسب جميع الأذواق.',
     link: '/sunglasses',
     gradient: 'from-yellow-400 to-orange-500',
     image: 'https://images.unsplash.com/photo-1764778055595-b641b067ab40?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
     bgColor: 'bg-orange-50',
   },
   {
-    titleKey: 'category.eyeglasses',
-    descKey: 'category.eyeglasses.desc',
+    title: 'نظارات طبية',
+    desc: 'إطارات طبية أنيقة وعملية مع عدسات عالية الجودة لتوفير رؤية واضحة ومريحة طوال اليوم.',
     link: '/eyeglasses',
     gradient: 'from-blue-400 to-blue-600',
     image: 'https://images.unsplash.com/photo-1565428730183-830036459022?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
     bgColor: 'bg-blue-50',
   },
   {
-    titleKey: 'category.artificial',
-    descKey: 'category.artificial.desc',
+    title: 'عيون صناعية بالبصمة',
+    desc: 'عيون صناعية مخصصة ومصنعة بدقة باستخدام أحدث التقنيات لتبدو طبيعية تماماً وتعيد الثقة.',
     link: '/artificial-eyes',
     gradient: 'from-purple-400 to-purple-600',
     image: 'https://images.unsplash.com/photo-1602573991396-fb69ee6d7a0d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
     bgColor: 'bg-purple-50',
   },
   {
-    titleKey: 'category.filters',
-    descKey: 'category.filters.desc',
+    title: 'فلاتر ضوئية (لعمى الألوان)',
+    desc: 'فلاتر ضوئية متخصصة لتحسين الرؤية وتصحيح عمى الألوان لتجربة بصرية أكثر وضوحاً وتميزاً.',
     link: '/light-filters',
     gradient: 'from-green-400 to-teal-600',
     image: 'https://images.unsplash.com/photo-1715175430490-f71cbe98beb9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
@@ -72,7 +72,7 @@ export function CategoryGrid() {
                 <div className="relative h-56 overflow-hidden">
                   <img
                     src={category.image}
-                    alt={t(category.titleKey)}
+                    alt={category.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   {/* Gradient Overlay */}
@@ -81,7 +81,7 @@ export function CategoryGrid() {
                   {/* Badge */}
                   <div className={`absolute top-4 ${language === 'ar' ? 'right-4' : 'left-4'} ${category.bgColor} backdrop-blur-sm px-3 py-1 rounded-full shadow-md`}>
                     <span className={`text-xs font-bold bg-gradient-to-r ${category.gradient} bg-clip-text text-transparent`}>
-                      {language === 'ar' ? 'جديد' : 'NEW'}
+                      جديد
                     </span>
                   </div>
 
@@ -92,15 +92,15 @@ export function CategoryGrid() {
                 {/* Content */}
                 <div className="p-6 relative z-10">
                   <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
-                    {t(category.titleKey)}
+                    {category.title}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {t(category.descKey)}
+                    {category.desc}
                   </p>
                   
                   {/* CTA */}
                   <div className="flex items-center gap-2 text-primary font-medium group-hover:gap-3 transition-all duration-300">
-                    <span className="text-sm">{language === 'ar' ? 'عرض التفاصيل' : 'View Details'}</span>
+                    <span className="text-sm">عرض التفاصيل</span>
                     <ArrowRight className={`w-4 h-4 transition-transform duration-300 ${language === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`} />
                   </div>
                 </div>

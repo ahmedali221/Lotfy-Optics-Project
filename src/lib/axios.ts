@@ -1,15 +1,15 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '/api',
+  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Attach admin token when present
+// Attach JWT: prefer customer token; fall back to admin token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('adminToken');
+  const token = localStorage.getItem('customerToken') || localStorage.getItem('adminToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
