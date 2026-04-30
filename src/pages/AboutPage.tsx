@@ -1,6 +1,6 @@
 import { useLanguage } from '../context/LanguageContext';
 import { Eye, Award, Users, MapPin, Target, Heart, Briefcase, CheckCircle } from 'lucide-react';
-import storeImage from 'figma:asset/d408b73af242fc40130cc13c551eaf8b90c15eb2.png';
+const storeImage = 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop';
 import { Glasses } from 'lucide-react';
 
 export function AboutPage() {

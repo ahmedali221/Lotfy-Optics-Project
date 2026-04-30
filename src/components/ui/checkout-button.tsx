@@ -1,4 +1,4 @@
-import checkoutButtonImage from 'figma:asset/d42b7122b46cff307bc49f501488af163290c855.png';
+const checkoutButtonImage = '';
 
 interface CheckoutButtonProps {
   onClick: () => void;

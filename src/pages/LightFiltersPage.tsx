@@ -7,7 +7,7 @@ import { Check, Phone, Info, CheckCircle, Search } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Link } from 'react-router';
-import heroImage from 'figma:asset/0e87ba6c96d9c30ba1b8d59e29e96c3c3e32e88d.png';
+const heroImage = 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=1600&h=900&fit=crop';
 
 export function LightFiltersPage() {
   const { t, language } = useLanguage();

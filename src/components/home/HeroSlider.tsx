@@ -2,7 +2,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import { Sun, Calendar, ChevronDown } from 'lucide-react';
-import heroImage from 'figma:asset/eafae65b441b82cb3d0b78ca5bb08b14ff76d6d6.png';
+const heroImage = 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=1600&h=900&fit=crop';
 
 export function HeroSlider() {
   const { language } = useLanguage();

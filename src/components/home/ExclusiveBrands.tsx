@@ -1,6 +1,6 @@
 import { useLanguage } from '../../context/LanguageContext';
 import { CheckCircle, Award } from 'lucide-react';
-import pixxBanner from 'figma:asset/7fe19227599961c777a6a1edf02123c3836e9bca.png';
+const pixxBanner = 'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=800&h=400&fit=crop';
 
 export function ExclusiveBrands() {
   const { language } = useLanguage();

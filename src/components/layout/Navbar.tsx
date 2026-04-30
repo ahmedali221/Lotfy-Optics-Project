@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { ShoppingCart, Heart, Menu, X, ChevronDown, Sun, Glasses, Search, User, LogOut, LogIn } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { AuthModal } from '../auth/AuthModal';
-import logo from 'figma:asset/6cf34647e4fbb686586e5bf4df6ca696eb0c53aa.png';
+const logo = '';
 
 export function Navbar() {
   const { language, t } = useLanguage();

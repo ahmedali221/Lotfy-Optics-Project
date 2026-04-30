@@ -6,7 +6,7 @@ import { Link } from 'react-router';
 import { ApiProductCard } from '../components/products/ApiProductCard';
 import { ApiProduct } from '../types/api';
 import { Calendar, Shield, Award, Truck, ArrowRight, Clock, BadgeCheck, Star } from 'lucide-react';
-import pixxLogo from 'figma:asset/2670385029b046e1a151f095f484f8d2909ea64f.png';
+const pixxLogo = 'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=200&h=200&fit=crop';
 import api from '../lib/axios';
 
 export function HomePage() {

@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { useLanguage } from '../../context/LanguageContext';
 import { Facebook, Instagram, Phone, Mail, MapPin } from 'lucide-react';
-import logo from 'figma:asset/6cf34647e4fbb686586e5bf4df6ca696eb0c53aa.png';
+const logo = '';
 
 export function Footer() {
   const { t } = useLanguage();
