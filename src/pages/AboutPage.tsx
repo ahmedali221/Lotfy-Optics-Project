@@ -9,8 +9,8 @@ export function AboutPage() {
   const stats = [
     {
       icon: Award,
-      number: '25+',
-      title: { ar: 'سنوات من الخبرة', en: '25+ Years Experience' },
+      number: '15+',
+      title: { ar: 'سنوات من الخبرة', en: '15+ Years Experience' },
     },
     {
       icon: Users,
@@ -89,7 +89,7 @@ export function AboutPage() {
   ];
 
   const features = [
-    { ar: 'أكثر من 25 عاماً من الخبرة والتميز', en: 'Over 25 years of experience and excellence' },
+    { ar: 'أكثر من 15 عاماً من الخبرة والتميز', en: 'Over 15 years of experience and excellence' },
     { ar: 'أحدث التقنيات الطبية في الفحوصات', en: 'Latest medical technologies in examinations' },
     { ar: 'فريق من الأطباء والفنيين المتخصصين', en: 'Team of specialized doctors and technicians' },
     { ar: 'أرقى الماركات اامية للنظارات', en: 'Finest international eyewear brands' },
@@ -116,19 +116,19 @@ export function AboutPage() {
             backgroundSize: '40px 40px'
           }}></div>
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-block px-6 py-2 bg-primary/30 backdrop-blur-sm rounded-full text-primary border border-primary/30 mb-6">
               <span className="text-sm font-medium">
-                {language === 'ar' ? 'منذ عام 1999' : 'Since 1999'}
+                {language === 'ar' ? 'منذ عام 2011' : 'Since 2011'}
               </span>
             </div>
-            
+
             <h1 className="mb-6 text-white text-4xl md:text-5xl lg:text-6xl font-bold drop-shadow-2xl">
               {language === 'ar' ? 'محلات لطفي أوبتيكال' : 'LOTFY OPTICAL'}
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-white/95 mb-10 leading-relaxed drop-shadow-lg">
               {language === 'ar'
                 ? 'رحلة من الثقة والتميز في خدمة العيون'
@@ -191,7 +191,7 @@ export function AboutPage() {
                 }
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Image */}
               <div className="relative group">
@@ -335,7 +335,7 @@ export function AboutPage() {
 
                   {/* Small Box with Stats */}
                   <div className="relative rounded-2xl bg-gradient-to-br from-primary to-secondary p-6 shadow-xl h-[200px] flex flex-col justify-center items-center text-white">
-                    <div className="text-5xl font-bold mb-2">25+</div>
+                    <div className="text-5xl font-bold mb-2">15+</div>
                     <div className="text-center text-sm">
                       {language === 'ar' ? 'عاا من التميز' : 'Years of Excellence'}
                     </div>
@@ -355,12 +355,12 @@ export function AboutPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-secondary mb-3">
-                      {language === 'ar' ? 'البداية في 1999' : 'The Beginning in 1999'}
+                      {language === 'ar' ? 'البداية في 2011' : 'The Beginning in 1999'}
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
                       {language === 'ar'
                         ? 'بدأت قصة لطفي أوبتيكال في عام 1999 برؤية واضحة: تقديم أفضل خدمات العناية بالعيون في صعيد مصر. من البداية المواضعة مونا لنصبح واحدة من أبرز الوجهات في أسيوط لكل ما يتعلق بصحة وجمال العيون.'
-                        : 'The story of LOTFY OPTICAL began in 1999 with a clear vision: to provide the best eye care services in Upper Egypt. From humble beginnings, we have grown to become one of the premier destinations in Assiut for everything related to eye health and beauty.'
+                        : 'The story of LOTFY OPTICAL began in 2011 with a clear vision: to provide the best eye care services in Upper Egypt. From humble beginnings, we have grown to become one of the premier destinations in Assiut for everything related to eye health and beauty.'
                       }
                     </p>
                   </div>
@@ -393,8 +393,8 @@ export function AboutPage() {
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
                       {language === 'ar'
-                        ? 'على مدار أكثر من 25 عاماً، خدمنا أكثر من 50,000 عميل راضٍ، وأصبحنا الخيار الأل لآلاف العائلات في صعيد مصر. ثقتكم بنا هي سر نجاحنا واستمراريتنا.'
-                        : 'Over more than 25 years, we have served over 50,000 satisfied customers and become the first choice for thousands of families in Upper Egypt. Your trust in us is the secret of our success and continuity.'
+                        ? 'على مدار أكثر من 15 عاماً، خدمنا أكثر من 50,000 عميل راضٍ، وأصبحنا الخيار الأل لآلاف العائلات في صعيد مصر. ثقتكم بنا هي سر نجاحنا واستمراريتنا.'
+                        : 'Over more than 15 years, we have served over 50,000 satisfied customers and become the first choice for thousands of families in Upper Egypt. Your trust in us is the secret of our success and continuity.'
                       }
                     </p>
                   </div>
@@ -413,7 +413,7 @@ export function AboutPage() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="relative p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl border-2 border-primary/20 hover:border-primary hover:shadow-xl transition-all duration-300">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl text-white font-bold text-xl mb-4">
-                    1999
+                    2019
                   </div>
                   <h4 className="font-bold mb-2 text-secondary">
                     {language === 'ar' ? 'التأسيس' : 'Foundation'}
@@ -425,7 +425,19 @@ export function AboutPage() {
 
                 <div className="relative p-6 bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-2xl border-2 border-secondary/20 hover:border-secondary hover:shadow-xl transition-all duration-300">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-2xl text-white font-bold text-xl mb-4">
-                    2010
+                    2021
+                  </div>
+                  <h4 className="font-bold mb-2 text-secondary">
+                    {language === 'ar' ? 'الريادة' : 'Leadership'}
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'ar' ? 'آلاف العملاء الراضين عن خدماتنا' : 'Thousands of customers satisfied with our services'}
+                  </p>
+                </div>
+
+                <div className="relative p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl border-2 border-primary/20 hover:border-primary hover:shadow-xl transition-all duration-300">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl text-white font-bold text-xl mb-4">
+                    2026
                   </div>
                   <h4 className="font-bold mb-2 text-secondary">
                     {language === 'ar' ? 'التوسع' : 'Expansion'}
@@ -435,27 +447,15 @@ export function AboutPage() {
                   </p>
                 </div>
 
-                <div className="relative p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl border-2 border-primary/20 hover:border-primary hover:shadow-xl transition-all duration-300">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl text-white font-bold text-xl mb-4">
-                    2018
+                <div className="relative p-6 bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-2xl border-2 border-secondary/20 hover:border-secondary hover:shadow-xl transition-all duration-300">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-2xl text-white font-bold text-xl mb-4">
+                    2026
                   </div>
                   <h4 className="font-bold mb-2 text-secondary">
                     {language === 'ar' ? 'التطوير' : 'Development'}
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    {language === 'ar' ? 'إضافة خدمات العيون الصناعية' : 'Adding artificial eyes services'}
-                  </p>
-                </div>
-
-                <div className="relative p-6 bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-2xl border-2 border-secondary/20 hover:border-secondary hover:shadow-xl transition-all duration-300">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-2xl text-white font-bold text-xl mb-4">
-                    2024
-                  </div>
-                  <h4 className="font-bold mb-2 text-secondary">
-                    {language === 'ar' ? 'الريادة' : 'Leadership'}
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {language === 'ar' ? 'أكثر من 50,000 عميل راض' : 'Over 50,000 satisfied customers'}
+                    {language === 'ar' ? 'إضافة خدمات العيون الصناعية وإنشاء عيادات خاصة' : 'Adding artificial eyes services and establishing private clinics'}
                   </p>
                 </div>
               </div>
@@ -493,7 +493,7 @@ export function AboutPage() {
               }
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {values.map((value, index) => {
               const Icon = value.icon;
@@ -524,7 +524,7 @@ export function AboutPage() {
               {language === 'ar' ? 'خدماتنا المتكاملة' : 'Our Comprehensive Services'}
             </h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {services.map((service, index) => (
               <div
@@ -595,7 +595,7 @@ export function AboutPage() {
                   {language === 'ar' ? 'فريق متخصص' : 'Specialized Team'}
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  {language === 'ar' ? 'خبرة أكثر من 25 عاماً' : 'Over 25 years experience'}
+                  {language === 'ar' ? 'خبرة أكثر من 15 عاماً' : 'Over 15 years experience'}
                 </p>
               </div>
 

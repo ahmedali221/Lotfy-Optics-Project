@@ -3,10 +3,10 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
-import { ShoppingCart, Heart, Menu, X, ChevronDown, Sun, Glasses, Search, User, LogOut, LogIn } from 'lucide-react';
+import { ShoppingCart, Heart, Menu, X, ChevronDown, Sun, Glasses, Search, User, LogOut, LogIn, Eye, Rainbow } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { AuthModal } from '../auth/AuthModal';
-const logo = '';
+import logo from '../../assets/logo.png';
 
 export function Navbar() {
   const { language, t } = useLanguage();
@@ -47,9 +47,18 @@ export function Navbar() {
       icon: Glasses,
       color: 'text-blue-600'
     },
-    // No API category — API only supports: frame, lens, accessory
-    // { path: '/light-filters', label: t('nav.filters'), icon: Rainbow, color: 'text-purple-600' },
-    // { path: '/artificial-eyes', label: t('nav.artificial'), icon: Eye, color: 'text-green-600' },
+    {
+      path: '/artificial-eyes',
+      label: language === 'ar' ? 'عيون صناعيه' : 'Artificial Eyes',
+      icon: Eye,
+      color: 'text-green-600'
+    },
+    {
+      path: '/light-filters',
+      label: language === 'ar' ? 'فلاتر ضوئيه' : 'Light Filters',
+      icon: Rainbow,
+      color: 'text-purple-600'
+    },
   ];
 
   const mainNavLinks = [
@@ -60,7 +69,7 @@ export function Navbar() {
   const otherNavLinks = [
     // No API endpoint — commented until backend adds clinic/article data
     // { path: '/clinics', label: t('nav.clinics') },
-    // { path: '/articles', label: t('nav.articles') },
+    { path: '/articles', label: t('nav.articles') },
     { path: '/contact', label: t('nav.contact') },
   ];
 
@@ -99,7 +108,7 @@ export function Navbar() {
 
               {/* Dropdown Menu */}
               {isProductsDropdownOpen && (
-                <div 
+                <div
                   className="absolute top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-border animate-in fade-in slide-in-from-top-2 duration-200"
                   onMouseLeave={() => setIsProductsDropdownOpen(false)}
                   style={language === 'ar' ? { right: 0 } : { left: 0 }}
@@ -260,7 +269,7 @@ export function Navbar() {
                   <span>{t('nav.products')}</span>
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isMobileProductsOpen ? 'rotate-180' : ''}`} />
                 </button>
-                
+
                 {isMobileProductsOpen && (
                   <div className="mt-2 space-y-1 bg-background/50 rounded-lg p-2">
                     {productCategories.map((category) => {

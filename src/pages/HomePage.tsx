@@ -16,7 +16,7 @@ export function HomePage() {
   useEffect(() => {
     api.get('/api/catalog/products/', { params: { is_active: 'true', page_size: 8, ordering: '-id' } })
       .then(({ data }) => setFeaturedProducts(data.results ?? data))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const features = [
@@ -75,7 +75,7 @@ export function HomePage() {
                 <h2 className="white mb-5" style={{ color: '#ffffff' }}>
                   {language === 'ar' ? 'مركز لطفي للبصريات الطبي' : 'LOTFY OPTICAL Medical Center'}
                 </h2>
-                
+
                 <p className="text-white/80 text-lg mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                   {language === 'ar'
                     ? 'مركز طبي متكامل مجهز بأحدث التقنيات الطبية مع فريق من الأطباء المتخصصين'
@@ -95,12 +95,12 @@ export function HomePage() {
               {/* Left Side - Stats */}
               <div className="lg:col-span-2 grid grid-cols-2 gap-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/10">
-                  <div className="text-4xl font-bold text-primary mb-2">25+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">15+</div>
                   <p className="text-white/70 text-sm">{language === 'ar' ? 'سنة خبرة' : 'Years'}</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/10">
-                  <div className="text-4xl font-bold text-primary mb-2">10K+</div>
-                  <p className="text-white/70 text-sm">{language === 'ar' ? 'فحص سنوياً' : 'Exams/Year'}</p>
+                  <div className="text-4xl font-bold text-primary mb-2">50K+</div>
+                  <p className="text-white/70 text-sm">{language === 'ar' ? 'عميل راضٍ' : 'Happy Clients'}</p>
                 </div>
                 <div className="col-span-2 bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/10">
                   <div className="text-4xl font-bold text-primary mb-2">100%</div>
@@ -120,7 +120,7 @@ export function HomePage() {
               {language === 'ar' ? 'أحدث المنتجات' : 'Latest Products'}
             </h2>
             <p className="text-muted-foreground">
-              {language === 'ar' 
+              {language === 'ar'
                 ? 'تصفح أحدث إضافاتنا من النظارات والمنتجات البصرية'
                 : 'Browse our latest additions of eyewear and optical products'
               }
@@ -131,14 +131,14 @@ export function HomePage() {
             {featuredProducts.length > 0
               ? featuredProducts.map(p => <ApiProductCard key={p.id} product={p} />)
               : Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
-                    <div className="aspect-square bg-gray-100" />
-                    <div className="p-4 space-y-2">
-                      <div className="h-4 bg-gray-100 rounded w-3/4" />
-                      <div className="h-3 bg-gray-100 rounded w-1/2" />
-                    </div>
+                <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
+                  <div className="aspect-square bg-gray-100" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-100 rounded w-3/4" />
+                    <div className="h-3 bg-gray-100 rounded w-1/2" />
                   </div>
-                ))
+                </div>
+              ))
             }
           </div>
 
@@ -254,8 +254,8 @@ export function HomePage() {
                 <div className="bg-gradient-to-br from-secondary via-secondary to-secondary/95 text-white p-8 lg:p-12 flex flex-col justify-center">
                   {/* Title */}
                   <h2 className="text-3xl lg:text-4xl font-bold mb-6 text-white">
-                    {language === 'ar' 
-                      ? 'الوكيل الحصري لماركة Pixx في مصر' 
+                    {language === 'ar'
+                      ? 'الوكيل الحصري لماركة Pixx في مصر'
                       : 'Exclusive Agent for Pixx in Egypt'
                     }
                   </h2>
@@ -275,8 +275,8 @@ export function HomePage() {
                         <BadgeCheck className="w-4 h-4 text-white" />
                       </div>
                       <p className="text-white/95">
-                        {language === 'ar' 
-                          ? 'منتجات أصلية 100% مستوردة مباشرة' 
+                        {language === 'ar'
+                          ? 'منتجات أصلية 100% مستوردة مباشرة'
                           : '100% authentic products imported directly'
                         }
                       </p>
@@ -287,8 +287,8 @@ export function HomePage() {
                         <BadgeCheck className="w-4 h-4 text-white" />
                       </div>
                       <p className="text-white/95">
-                        {language === 'ar' 
-                          ? 'تصاميم عصرية وجودة عالمية مميزة' 
+                        {language === 'ar'
+                          ? 'تصاميم عصرية وجودة عالمية مميزة'
                           : 'Modern designs and distinguished international quality'
                         }
                       </p>
@@ -299,8 +299,8 @@ export function HomePage() {
                         <BadgeCheck className="w-4 h-4 text-white" />
                       </div>
                       <p className="text-white/95">
-                        {language === 'ar' 
-                          ? 'ضمان رسمي على جميع المنتجات' 
+                        {language === 'ar'
+                          ? 'ضمان رسمي على جميع المنتجات'
                           : 'Official warranty on all products'
                         }
                       </p>
@@ -311,8 +311,8 @@ export function HomePage() {
                         <BadgeCheck className="w-4 h-4 text-white" />
                       </div>
                       <p className="text-white/95">
-                        {language === 'ar' 
-                          ? 'تشكيلة واسعة ومتجددة باستمرار' 
+                        {language === 'ar'
+                          ? 'تشكيلة واسعة ومتجددة باستمرار'
                           : 'Wide and constantly updated collection'
                         }
                       </p>
@@ -325,9 +325,9 @@ export function HomePage() {
                     className="inline-flex items-center justify-center gap-3 bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl group"
                   >
                     <span>{language === 'ar' ? 'تسوق الآن' : 'Shop Now'}</span>
-                    <ArrowRight 
-                      className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
-                      style={{ transform: language === 'ar' ? 'scaleX(-1)' : 'none' }} 
+                    <ArrowRight
+                      className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                      style={{ transform: language === 'ar' ? 'scaleX(-1)' : 'none' }}
                     />
                   </Link>
                 </div>
@@ -424,7 +424,7 @@ export function HomePage() {
         {/* Background Decoration */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           {/* Section Header */}
           <div className="text-center mb-12">
@@ -455,7 +455,7 @@ export function HomePage() {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
+
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4">
                   <span className="inline-block px-3 py-1 bg-primary text-white text-xs font-medium rounded-full">
@@ -463,14 +463,14 @@ export function HomePage() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="p-6">
                 {/* Date */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                   <Clock className="w-4 h-4" />
                   <span>{language === 'ar' ? '15 فبراير 2026' : 'February 15, 2026'}</span>
                 </div>
-                
+
                 {/* Title */}
                 <h3 className="font-bold text-xl mb-3 text-secondary group-hover:text-primary transition-colors duration-300 line-clamp-2">
                   {language === 'ar'
@@ -478,7 +478,7 @@ export function HomePage() {
                     : 'Essential Tips for Protecting Your Eyes in the Digital Age'
                   }
                 </h3>
-                
+
                 {/* Excerpt */}
                 <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
                   {language === 'ar'
@@ -486,7 +486,7 @@ export function HomePage() {
                     : 'With long hours spent in front of screens, it has become essential to follow specific tips to maintain eye health and avoid visual fatigue. Learn the most important tips from our experts.'
                   }
                 </p>
-                
+
                 {/* Read More Link */}
                 <Link
                   to="/article/1"
@@ -507,7 +507,7 @@ export function HomePage() {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
+
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4">
                   <span className="inline-block px-3 py-1 bg-secondary text-white text-xs font-medium rounded-full">
@@ -515,14 +515,14 @@ export function HomePage() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="p-6">
                 {/* Date */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                   <Clock className="w-4 h-4" />
                   <span>{language === 'ar' ? '12 فبراير 2026' : 'February 12, 2026'}</span>
                 </div>
-                
+
                 {/* Title */}
                 <h3 className="font-bold text-xl mb-3 text-secondary group-hover:text-primary transition-colors duration-300 line-clamp-2">
                   {language === 'ar'
@@ -530,7 +530,7 @@ export function HomePage() {
                     : 'Latest Eyewear Trends 2026: Choose the Perfect Frame for Your Style'
                   }
                 </h3>
-                
+
                 {/* Excerpt */}
                 <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
                   {language === 'ar'
@@ -538,7 +538,7 @@ export function HomePage() {
                     : 'Discover the latest eyewear trends this year and how to choose the frame that suits your face shape and personal style. A comprehensive guide from our fashion experts.'
                   }
                 </p>
-                
+
                 {/* Read More Link */}
                 <Link
                   to="/article/2"
@@ -559,7 +559,7 @@ export function HomePage() {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
+
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4">
                   <span className="inline-block px-3 py-1 bg-primary text-white text-xs font-medium rounded-full">
@@ -567,14 +567,14 @@ export function HomePage() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="p-6">
                 {/* Date */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                   <Clock className="w-4 h-4" />
                   <span>{language === 'ar' ? '10 فبراير 2026' : 'February 10, 2026'}</span>
                 </div>
-                
+
                 {/* Title */}
                 <h3 className="font-bold text-xl mb-3 text-secondary group-hover:text-primary transition-colors duration-300 line-clamp-2">
                   {language === 'ar'
@@ -582,7 +582,7 @@ export function HomePage() {
                     : 'When Should You Get a Comprehensive Eye Exam? Complete Guide'
                   }
                 </h3>
-                
+
                 {/* Excerpt */}
                 <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
                   {language === 'ar'
@@ -590,7 +590,7 @@ export function HomePage() {
                     : 'Regular eye exams are essential for maintaining your vision health and detecting problems early. Learn about recommended schedules and important tests.'
                   }
                 </p>
-                
+
                 {/* Read More Link */}
                 <Link
                   to="/article/3"

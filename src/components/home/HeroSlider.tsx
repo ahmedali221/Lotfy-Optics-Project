@@ -2,21 +2,20 @@ import { useLanguage } from '../../context/LanguageContext';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import { Sun, Calendar, ChevronDown } from 'lucide-react';
-const heroImage = 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=1600&h=900&fit=crop';
-
+import hero from "../../assets/hero.png"
 export function HeroSlider() {
   const { language } = useLanguage();
 
   return (
     <div className="relative h-screen overflow-hidden">
       {/* Background Image with Overlay */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: `url(${heroImage})`,
+          backgroundImage: `url(${hero})`,
         }}
       />
-      
+
       <div className="absolute inset-0 bg-gradient-to-r from-secondary/90 to-secondary/20" />
 
       {/* Content */}
@@ -24,12 +23,12 @@ export function HeroSlider() {
         <div className="container mx-auto px-4">
           <div className={`max-w-2xl ${language === 'ar' ? 'mr-0' : 'ml-0'}`}>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
-              {language === 'ar' 
-                ? 'مركز لطفي للبصريات' 
+              {language === 'ar'
+                ? 'مركز لطفي للبصريات'
                 : 'LOTFY OPTICAL CENTER'
               }
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-white/90 mb-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               {language === 'ar'
                 ? 'رؤية واضحة... حياة أجمل'
@@ -39,8 +38,8 @@ export function HeroSlider() {
 
             <p className="text-lg md:text-xl text-white/80 mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               {language === 'ar'
-                ? 'متخصصون في العيون الصناعية بالبصمة والفلاتر الضوئية لعمى الألوان | خبرة تمتد لـ 40 عاماً'
-                : 'Specialists in Custom Artificial Eyes & Color Blindness Light Filters | 40 Years of Excellence'
+                ? 'متخصصون في النظارات الطبية، العيون الصناعية بالبصمة والفلاتر الضوئية لعمى الألوان | خبرة لمدة 15 عام'
+                : 'Specialists in Medical Eyewear, Custom Artificial Eyes & Color Blindness Light Filters | 15 Years of Experience'
               }
             </p>
 
@@ -50,7 +49,7 @@ export function HeroSlider() {
                 className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
                 <Sun className="w-5 h-5" />
-                <span>{language === 'ar' ? 'تسوق النظارات الشمسية' : 'Shop Sunglasses'}</span>
+                <span>{language === 'ar' ? 'تسوق النظارات الطبية' : 'Shop Glasses'}</span>
               </Link>
               <Link
                 to="/clinics"
