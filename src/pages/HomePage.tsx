@@ -6,17 +6,19 @@ import { Link } from 'react-router';
 import { ApiProductCard } from '../components/products/ApiProductCard';
 import { ApiProduct } from '../types/api';
 import { Calendar, Shield, Award, Truck, ArrowRight, Clock, BadgeCheck, Star } from 'lucide-react';
-const pixxLogo = 'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=200&h=200&fit=crop';
 import api from '../lib/axios';
-
+import pixxLogo from  '../assets/pix.png';
 export function HomePage() {
   const { t, language } = useLanguage();
   const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     api.get('/api/catalog/products/', { params: { is_active: 'true', page_size: 8, ordering: '-id' } })
       .then(({ data }) => setFeaturedProducts(data.results ?? data))
-      .catch(() => { });
+      .catch(() => { })
+      .finally(() => setLoading(false));
   }, []);
 
   const features = [
@@ -128,9 +130,8 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {featuredProducts.length > 0
-              ? featuredProducts.map(p => <ApiProductCard key={p.id} product={p} />)
-              : Array.from({ length: 8 }).map((_, i) => (
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
                   <div className="aspect-square bg-gray-100" />
                   <div className="p-4 space-y-2">
@@ -139,7 +140,16 @@ export function HomePage() {
                   </div>
                 </div>
               ))
-            }
+            ) : featuredProducts.length > 0 ? (
+              featuredProducts.map(p => <ApiProductCard key={p.id} product={p} />)
+            ) : (
+              <div className="col-span-full py-12 text-center">
+                <div className="text-5xl mb-4">✨</div>
+                <p className="text-muted-foreground">
+                  {language === 'ar' ? 'انتظروا تشكيلتنا الجديدة قريباً' : 'Stay tuned for our new collection soon'}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="text-center">

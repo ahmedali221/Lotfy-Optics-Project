@@ -23,37 +23,37 @@ export function ClinicsPage() {
       icon: Eye,
       key: 'refraction',
       title: t('clinics.service.refraction'),
-      desc: t('clinics.service.refraction.desc'),
+      desc: t('clinics.service.refraction_desc'),
     },
     {
       icon: Activity,
       key: 'retina',
       title: t('clinics.service.retina'),
-      desc: t('clinics.service.retina.desc'),
+      desc: t('clinics.service.retina_desc'),
     },
     {
       icon: Stethoscope,
       key: 'pressure',
       title: t('clinics.service.pressure'),
-      desc: t('clinics.service.pressure.desc'),
+      desc: t('clinics.service.pressure_desc'),
     },
     {
       icon: Glasses,
       key: 'contacts',
       title: t('clinics.service.contacts'),
-      desc: t('clinics.service.contacts.desc'),
+      desc: t('clinics.service.contacts_desc'),
     },
     {
       icon: Baby,
       key: 'amblyopia',
       title: t('clinics.service.amblyopia'),
-      desc: t('clinics.service.amblyopia.desc'),
+      desc: t('clinics.service.amblyopia_desc'),
     },
     {
       icon: Droplets,
       key: 'dryeye',
       title: t('clinics.service.dryeye'),
-      desc: t('clinics.service.dryeye.desc'),
+      desc: t('clinics.service.dryeye_desc'),
     },
   ];
 
@@ -138,7 +138,7 @@ export function ClinicsPage() {
       <div className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="text-center mb-12">
-            {language === 'ar' ? 'أحدث الأجهزة الطبية' : 'Latest Medical Equipment'}
+            {t('clinics.latestEquipment', 'أحدث الأجهزة الطبية')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {equipment.map((item, index) => (
@@ -158,10 +158,7 @@ export function ClinicsPage() {
             <div className="text-center mb-8">
               <h2 className="mb-2">{t('appointment.title')}</h2>
               <p className="text-muted-foreground">
-                {language === 'ar' 
-                  ? 'احجز موعدك الآن واحصل على أفضل رعاية لعينيك'
-                  : 'Book your appointment now and get the best care for your eyes'
-                }
+                {t('appointment.subtitle', 'احجز موعدك الآن واحصل على أفضل رعاية لعينيك')}
               </p>
             </div>
 

@@ -1,8 +1,7 @@
 import { useLanguage } from '../context/LanguageContext';
 import { Eye, Award, Users, MapPin, Target, Heart, Briefcase, CheckCircle } from 'lucide-react';
-const storeImage = 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop';
 import { Glasses } from 'lucide-react';
-
+import storeImage from '../assets/lotfyplace.png'
 export function AboutPage() {
   const { language } = useLanguage();
 
@@ -22,11 +21,7 @@ export function AboutPage() {
       number: '2',
       title: { ar: 'فروع في أسيوط', en: '2 Branches in Assiut' },
     },
-    {
-      icon: Eye,
-      number: '10,000+',
-      title: { ar: 'فحص طبي سنوياً', en: '10,000+ Medical Exams' },
-    },
+
   ];
 
   const values = [
@@ -151,7 +146,7 @@ export function AboutPage() {
       {/* Stats Section */}
       <div className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
@@ -269,7 +264,7 @@ export function AboutPage() {
                     </h4>
                     <p className="text-muted-foreground">
                       {language === 'ar'
-                        ? 'أطباء متخصصون وأحدث الأجهزة الطبية للفحوصات والكشف الشامل'
+                        ? 'فريق من أخصائي البصريات و الأطباء وأحدث الأجهزة الطبية للفحوصات والكشف الشامل'
                         : 'Specialized doctors and latest medical equipment for comprehensive examinations'
                       }
                     </p>

@@ -33,6 +33,7 @@ export function EyeglassesSubPage() {
 
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
   const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
+  const [selectedColours, setSelectedColours] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [search, setSearch] = useState('');
@@ -51,7 +52,7 @@ export function EyeglassesSubPage() {
   const fetchProducts = useCallback(() => {
     setLoading(true);
     const params: Record<string, string | number> = {
-      category: 'frame',
+      category: 'glasses',
       page_size: 100,
       is_active: 'true',
     };
@@ -75,9 +76,12 @@ export function EyeglassesSubPage() {
     return () => clearTimeout(timer);
   }, [fetchProducts]);
 
+  const uniqueColours = [...new Set(products.map(p => p.colour).filter(Boolean))].sort();
+
   const filtered = products.filter(p => {
     if (selectedBrands.length > 1 && !(p.brand && selectedBrands.includes(p.brand.id))) return false;
     if (selectedShapes.length > 1 && !(p.frame_shape && selectedShapes.includes(p.frame_shape))) return false;
+    if (selectedColours.length > 0 && !selectedColours.includes(p.colour)) return false;
     return true;
   });
 
@@ -86,6 +90,9 @@ export function EyeglassesSubPage() {
 
   const toggleShape = (v: string) =>
     setSelectedShapes(prev => prev.includes(v) ? prev.filter(s => s !== v) : [...prev, v]);
+
+  const toggleColour = (v: string) =>
+    setSelectedColours(prev => prev.includes(v) ? prev.filter(c => c !== v) : [...prev, v]);
 
   const title = TITLES[category]?.[language] ?? TITLES.men[language];
 
@@ -156,6 +163,20 @@ export function EyeglassesSubPage() {
                 ))}
               </div>
             </div>
+
+            {uniqueColours.length > 0 && (
+              <div className="bg-white rounded-xl p-4 border border-border shadow-sm">
+                <h3 className="font-bold mb-3 text-sm">{t('اللون', 'Colour')}</h3>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {uniqueColours.map(colour => (
+                    <label key={colour} className="flex items-center gap-2 cursor-pointer group">
+                      <input type="checkbox" checked={selectedColours.includes(colour)} onChange={() => toggleColour(colour)} className="w-4 h-4 text-primary focus:ring-primary rounded" />
+                      <span className="text-sm group-hover:text-primary transition-colors">{colour}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Products */}

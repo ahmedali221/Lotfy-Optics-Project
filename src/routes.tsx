@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router';
 import { Layout } from './components/layout/Layout';
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
-import { SunglassesPage } from './pages/SunglassesPage';
+import { LensesPage } from './pages/SunglassesPage';
 import { EyeglassesPage } from './pages/EyeglassesPage';
 import { EyeglassesSubPage } from './pages/EyeglassesSubPage';
 import { ArtificialEyesPage } from './pages/ArtificialEyesPage';
@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: HomePage },
       { path: 'about', Component: AboutPage },
-      { path: 'sunglasses', Component: SunglassesPage },
+      { path: 'lenses', Component: LensesPage },
       { path: 'eyeglasses', Component: EyeglassesPage },
       { path: 'eyeglasses/:category', Component: EyeglassesSubPage },
       { path: 'artificial-eyes', Component: ArtificialEyesPage },

@@ -4,6 +4,7 @@
     "about": "About Us",
     "products": "Products",
     "sunglasses": "Sunglasses",
+    "lenses": "Lenses",
     "eyeglasses": "Eyeglasses",
     "artificial": "Artificial Eyes",
     "filters": "Light Filters (Color Blindness)",
@@ -78,6 +79,7 @@
     "subtitle": "Your Vision is Our Trust",
     "services": "Our Medical Services",
     "bookAppointment": "Book Your Appointment",
+    "latestEquipment": "Latest Medical Equipment",
     "service": {
       "refraction": "Vision Test",
       "refraction_desc": "Accurate test with latest equipment",
@@ -95,6 +97,7 @@
   },
   "appointment": {
     "title": "Book Appointment",
+    "subtitle": "Book your appointment now and get the best care for your eyes",
     "name": "Full Name",
     "phone": "Phone Number",
     "email": "Email",

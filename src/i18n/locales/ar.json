@@ -4,9 +4,10 @@
     "about": "من نحن",
     "products": "المنتجات",
     "sunglasses": "نظارات شمسية",
-    "eyeglasses": "نظارات طبية",
+    "lenses": "عدسات",
+    "eyeglasses": "نظارات",
     "artificial": "عيون صناعية بالبصمة",
-    "filters": "فلاتر ضوئية (لعمى الألوان)",
+    "filters": " فلاتر ضوئية ( لعمى الألوان )",
     "clinics": "العيادات",
     "branches": "الفروع",
     "contact": "اتصل بنا",
@@ -30,11 +31,11 @@
   "category": {
     "sunglasses": "نظارات شمسية",
     "sunglasses_desc": "تصفح المجموعة",
-    "eyeglasses": "نظارات طبية",
+    "eyeglasses": "نظارات",
     "eyeglasses_desc": "تصفح المجموعة",
     "artificial": "عيون صناعية بالبصمة",
     "artificial_desc": "استفسر الآن",
-    "filters": "فلاتر ضوئية (لعمى الألوان)",
+    "filters": "فلاتر ضوئية ( لعمى الألوان )",
     "filters_desc": "تصفح المجموعة"
   },
   "products": {
@@ -78,6 +79,7 @@
     "subtitle": "رؤيتك أمانتنا",
     "services": "خدماتنا الطبية",
     "bookAppointment": "احجز موعدك الآن",
+    "latestEquipment": "أحدث الأجهزة الطبية",
     "service": {
       "refraction": "فحص قياس النظر",
       "refraction_desc": "فحص دقيق بأحدث الأجهزة",
@@ -95,6 +97,7 @@
   },
   "appointment": {
     "title": "حجز موعد",
+    "subtitle": "احجز موعدك الآن واحصل على أفضل رعاية لعينيك",
     "name": "الاسم الكامل",
     "phone": "رقم الهاتف",
     "email": "البريد الإلكتروني",

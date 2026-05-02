@@ -3,7 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
-import { ShoppingCart, Heart, Menu, X, ChevronDown, Sun, Glasses, Search, User, LogOut, LogIn, Eye, Rainbow } from 'lucide-react';
+import { ShoppingCart, Heart, Menu, X, ChevronDown, Aperture, Glasses, Search, User, LogOut, LogIn, Eye, Rainbow } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { AuthModal } from '../auth/AuthModal';
 import logo from '../../assets/logo.png';
@@ -36,26 +36,26 @@ export function Navbar() {
 
   const productCategories = [
     {
-      path: '/sunglasses',
-      label: t('nav.sunglasses'),
-      icon: Sun,
-      color: 'text-yellow-600'
-    },
-    {
       path: '/eyeglasses',
-      label: t('nav.eyeglasses'),
+      label: t('nav.eyeglasses'), // "نظارات"
       icon: Glasses,
       color: 'text-blue-600'
     },
     {
+      path: '/lenses',
+      label: language === 'ar' ? 'عدسات' : 'Lenses',
+      icon: Aperture,
+      color: 'text-cyan-600'
+    },
+    {
       path: '/artificial-eyes',
-      label: language === 'ar' ? 'عيون صناعيه' : 'Artificial Eyes',
+      label: t('nav.artificial'), // "عيون صناعية"
       icon: Eye,
       color: 'text-green-600'
     },
     {
       path: '/light-filters',
-      label: language === 'ar' ? 'فلاتر ضوئيه' : 'Light Filters',
+      label: t('nav.filters'), // "فلاتر ضوئية"
       icon: Rainbow,
       color: 'text-purple-600'
     },

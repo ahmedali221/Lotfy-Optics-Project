@@ -4,25 +4,19 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
-import { ArrowRight, ArrowLeft, CreditCard, Smartphone, Banknote, MapPin, User, Phone, Mail, Home, CheckCircle, Loader2, Upload, X, ImageIcon } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CreditCard, MapPin, User, Phone, Mail, Home, CheckCircle, Loader2, Upload, X, ImageIcon } from 'lucide-react';
 import { resolveImageUrl } from '../components/products/ApiProductCard';
 import { AuthModal } from '../components/auth/AuthModal';
 import { toast } from 'sonner@2.0.3';
 import api from '../lib/axios';
 
-const SHIPPING_PRICES: Record<string, number> = {
-  'القاهرة': 50, 'الجيزة': 50, 'القليوبية': 50,
-  'الإسكندرية': 70, 'الدقهلية': 70, 'الشرقية': 70,
-  'المنوفية': 70, 'الغربية': 70, 'كفر الشيخ': 80,
-  'دمياط': 80, 'بورسعيد': 80, 'الإسماعيلية': 80,
-  'السويس': 80, 'البحيرة': 80, 'الفيوم': 80,
-  'بني سويف': 80, 'المنيا': 90, 'أسيوط': 90,
-  'سوهاج': 100, 'قنا': 100, 'الأقصر': 100,
-  'أسوان': 110, 'البحر الأحمر': 110, 'الوادي الجديد': 110,
-  'مطروح': 110, 'شمال سيناء': 120, 'جنوب سيناء': 120,
-};
+interface PaymentMethodType {
+  id: number;
+  name: string;
+  number: string;
+  is_active: boolean;
+}
 
-const GOVERNORATES = Object.keys(SHIPPING_PRICES);
 
 export function CheckoutPage() {
   const { language } = useLanguage();
@@ -32,7 +26,11 @@ export function CheckoutPage() {
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
 
   const [step, setStep] = useState<'info' | 'payment' | 'confirm'>('info');
-  const [paymentMethod, setPaymentMethod] = useState<'bank' | 'vodafone' | 'cash'>('cash');
+  const [apiPaymentMethods, setApiPaymentMethods] = useState<PaymentMethodType[]>([]);
+  const [apiDeliveryFees, setApiDeliveryFees] = useState<Record<string, number>>({});
+  const [governorates, setGovernorates] = useState<string[]>([]);
+  const [selectedMethodId, setSelectedMethodId] = useState<number | null>(null);
+  const [depositAmount, setDepositAmount] = useState(100);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -41,20 +39,42 @@ export function CheckoutPage() {
     governorate: '', city: '', address: '', notes: '',
   });
 
-  const [paymentData, setPaymentData] = useState({
-    vodafoneNumber: '', depositPaid: false,
-  });
+  const [depositPaid, setDepositPaid] = useState(false);
 
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
 
   const subtotal = getTotal();
-  const shippingCost = formData.governorate ? (SHIPPING_PRICES[formData.governorate] ?? 0) : 0;
+  const shippingCost = formData.governorate ? (apiDeliveryFees[formData.governorate] ?? 0) : 0;
   const total = subtotal + shippingCost;
-  const amountOnDelivery = paymentMethod === 'cash' ? total - 100 : 0;
+  const remaining = total - depositAmount;
+
+  const selectedMethod = apiPaymentMethods.find(m => m.id === selectedMethodId);
 
   useEffect(() => {
     if (items.length === 0) navigate('/cart');
+    
+    api.get('/api/orders/payment-methods/').then(res => {
+      const methods = (res.data.results || res.data).filter((m: PaymentMethodType) => m.is_active);
+      setApiPaymentMethods(methods);
+      if (methods.length > 0) setSelectedMethodId(methods[0].id);
+    }).catch(() => {});
+
+    api.get('/api/orders/delivery-fees/').then(res => {
+      const fees = res.data.results || res.data;
+      const feeMap: Record<string, number> = {};
+      const govs: string[] = [];
+      fees.forEach((f: any) => {
+        feeMap[f.governorate] = parseFloat(f.fee);
+        govs.push(f.governorate);
+      });
+      setApiDeliveryFees(feeMap);
+      setGovernorates(govs);
+    }).catch(() => {});
+
+    api.get('/api/orders/checkout-config/').then(res => {
+      setDepositAmount(parseFloat(res.data.deposit_amount));
+    }).catch(() => {});
   }, [items.length, navigate]);
 
   if (items.length === 0) return null;
@@ -67,10 +87,7 @@ export function CheckoutPage() {
     formData.address.trim() !== '';
 
   const isPaymentValid = () => {
-    if (!proofFile) return false;
-    if (paymentMethod === 'vodafone') return paymentData.vodafoneNumber.trim() !== '';
-    if (paymentMethod === 'cash') return paymentData.depositPaid;
-    return true;
+    return !!proofFile && depositPaid;
   };
 
   const handleProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,7 +132,7 @@ export function CheckoutPage() {
       formData.email ? `البريد: ${formData.email}` : null,
       `العنوان: ${formData.address}، ${formData.city}، ${formData.governorate}`,
       `الشحن: ${shippingCost} جنيه`,
-      `طريقة الدفع: ${paymentMethod === 'cash' ? 'كاش عند الاستلام' : paymentMethod === 'vodafone' ? `فودافون كاش (${paymentData.vodafoneNumber})` : 'تحويل بنكي'}`,
+      `طريقة الدفع: ${selectedMethod?.name ?? ''} ${selectedMethod?.number ? '(' + selectedMethod.number + ')' : ''}`,
       formData.notes ? `ملاحظات: ${formData.notes}` : null,
     ].filter(Boolean);
     return lines.join('\n');
@@ -129,7 +146,10 @@ export function CheckoutPage() {
         await api.post('/api/orders/cart-items/', { product: product.id, quantity });
       }
       // 2. Place order
-      const { data: order } = await api.post('/api/orders/', { notes: buildNotes() });
+      const { data: order } = await api.post('/api/orders/', { 
+        notes: buildNotes(),
+        payment_method_id: selectedMethodId 
+      });
 
       // 3. Upload payment proof
       if (proofFile) {
@@ -219,10 +239,10 @@ export function CheckoutPage() {
                       <label className="block text-sm font-medium mb-2"><MapPin className="w-4 h-4 inline me-1" />{t('المحافظة', 'Governorate')} *</label>
                       <select name="governorate" value={formData.governorate} onChange={handleInputChange} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
                         <option value="">{t('اختر المحافظة', 'Select Governorate')}</option>
-                        {GOVERNORATES.map(g => <option key={g} value={g}>{g}</option>)}
+                        {governorates.map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
                       {formData.governorate && (
-                        <p className="text-xs text-muted-foreground mt-1">{t('رسوم الشحن:', 'Shipping:')} {SHIPPING_PRICES[formData.governorate]} {t('جنيه', 'EGP')}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('رسوم الشحن:', 'Shipping:')} {apiDeliveryFees[formData.governorate]} {t('جنيه', 'EGP')}</p>
                       )}
                     </div>
                     <div>
@@ -247,82 +267,66 @@ export function CheckoutPage() {
               <div className="bg-white rounded-lg border border-border p-6">
                 <h2 className="mb-6">{t('طريقة الدفع', 'Payment Method')}</h2>
                 <div className="space-y-4">
-                  {/* Cash */}
-                  <label className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${paymentMethod === 'cash' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                    <div className="flex items-start gap-3">
-                      <input type="radio" name="paymentMethod" value="cash" checked={paymentMethod === 'cash'} onChange={() => setPaymentMethod('cash')} className="mt-1" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1"><Banknote className="w-5 h-5 text-primary" /><span className="font-medium">{t('الدفع عند الاستلام', 'Cash on Delivery')}</span></div>
-                        <p className="text-sm text-muted-foreground">{t('ادفع عربون 100 جنيه الآن، والباقي عند الاستلام', 'Pay 100 EGP deposit now, remaining on delivery')}</p>
-                        {paymentMethod === 'cash' && (
-                          <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
-                            <div className="flex justify-between text-sm">
-                              <span>{t('العربون المطلوب:', 'Required Deposit:')}</span>
-                              <span className="font-bold text-primary">100 {t('جنيه', 'EGP')}</span>
+                  {apiPaymentMethods.map(method => {
+                    const isSelected = selectedMethodId === method.id;
+                    return (
+                      <label key={method.id} className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${isSelected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
+                        <div className="flex items-start gap-3">
+                          <input type="radio" name="paymentMethod" value={method.id} checked={isSelected} onChange={() => setSelectedMethodId(method.id)} className="mt-1" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <CreditCard className="w-5 h-5 text-primary" />
+                              <span className="font-medium">{method.name}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
-                              <span>{t('المتبقي عند الاستلام:', 'Remaining on Delivery:')}</span>
-                              <span className="font-bold">{amountOnDelivery} {t('جنيه', 'EGP')}</span>
-                            </div>
-                            <div className="pt-3 border-t border-amber-200 text-xs space-y-2">
-                              <p className="text-muted-foreground">{t('يرجى تحويل العربون إلى:', 'Please transfer the deposit to:')}</p>
-                              <div className="bg-white rounded p-2"><strong>{t('فودافون كاش:', 'Vodafone Cash:')} </strong>01012345678</div>
-                              <div className="bg-white rounded p-2"><strong>{t('البنك الأهلي:', 'National Bank:')} </strong>1234567890123456</div>
-                            </div>
-                            <label className="flex items-center gap-2 mt-2">
-                              <input type="checkbox" checked={paymentData.depositPaid} onChange={e => setPaymentData({ ...paymentData, depositPaid: e.target.checked })} className="w-4 h-4" />
-                              <span className="text-sm">{t('تم دفع العربون', 'Deposit has been paid')}</span>
-                            </label>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </label>
+                            <p className="text-sm text-muted-foreground">
+                              {t(`ادفع عربون ${depositAmount} جنيه الآن، والباقي عند الاستلام`, `Pay ${depositAmount} EGP deposit now, remaining on delivery`)}
+                            </p>
 
-                  {/* Vodafone */}
-                  <label className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${paymentMethod === 'vodafone' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                    <div className="flex items-start gap-3">
-                      <input type="radio" name="paymentMethod" value="vodafone" checked={paymentMethod === 'vodafone'} onChange={() => setPaymentMethod('vodafone')} className="mt-1" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1"><Smartphone className="w-5 h-5 text-red-600" /><span className="font-medium">{t('فودافون كاش', 'Vodafone Cash')}</span></div>
-                        <p className="text-sm text-muted-foreground">{t('ادفع المبلغ كاملاً عبر فودافون كاش', 'Pay full amount via Vodafone Cash')}</p>
-                        {paymentMethod === 'vodafone' && (
-                          <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
-                            <p className="text-sm text-muted-foreground">{t(`حوّل ${total} جنيه إلى: 01012345678`, `Transfer ${total} EGP to: 01012345678`)}</p>
-                            <div>
-                              <label className="block text-sm font-medium mb-2">{t('رقم فودافون كاش الخاص بك', 'Your Vodafone Cash Number')}</label>
-                              <input type="tel" value={paymentData.vodafoneNumber} onChange={e => setPaymentData({ ...paymentData, vodafoneNumber: e.target.value })} placeholder="01xxxxxxxxx" className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
-                            </div>
+                            {isSelected && (
+                              <div className="mt-3 bg-white border border-border rounded-lg p-4 space-y-3">
+                                <div className="flex justify-between text-sm">
+                                  <span>{t('العربون المطلوب الآن:', 'Deposit Required Now:')}</span>
+                                  <span className="font-bold text-primary">{depositAmount.toLocaleString()} {t('جنيه', 'EGP')}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>{t('المتبقي عند الاستلام:', 'Remaining on Delivery:')}</span>
+                                  <span className="font-bold">{remaining.toLocaleString()} {t('جنيه', 'EGP')}</span>
+                                </div>
+                                {method.number && (
+                                  <div className="bg-gray-50 p-3 rounded border border-border">
+                                    <p className="text-sm">
+                                      <strong>{t('رقم التحويل / الحساب:', 'Transfer Number / Account:')} </strong>
+                                      {method.number}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </label>
-
-                  {/* Bank */}
-                  <label className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${paymentMethod === 'bank' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                    <div className="flex items-start gap-3">
-                      <input type="radio" name="paymentMethod" value="bank" checked={paymentMethod === 'bank'} onChange={() => setPaymentMethod('bank')} className="mt-1" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1"><CreditCard className="w-5 h-5 text-blue-600" /><span className="font-medium">{t('تحويل بنكي', 'Bank Transfer')}</span></div>
-                        <p className="text-sm text-muted-foreground">{t('ادفع المبلغ كاملاً عبر التحويل البنكي', 'Pay full amount via bank transfer')}</p>
-                        {paymentMethod === 'bank' && (
-                          <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-1 text-sm">
-                            <p><strong>{t('البنك:', 'Bank:')} </strong>{t('البنك الأهلي المصري', 'National Bank of Egypt')}</p>
-                            <p><strong>{t('رقم الحساب:', 'Account:')} </strong>1234567890123456</p>
-                            <p><strong>{t('المبلغ:', 'Amount:')} </strong>{total} {t('جنيه', 'EGP')}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </label>
+                        </div>
+                      </label>
+                    );
+                  })}
                 </div>
+
+                {/* Deposit confirmation */}
+                <label className="flex items-center gap-2 mt-4 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={depositPaid}
+                    onChange={e => setDepositPaid(e.target.checked)}
+                    className="w-4 h-4 accent-primary"
+                  />
+                  <span className="text-sm font-medium">
+                    {t(`تأكيد: تم دفع العربون (${depositAmount} جنيه)`, `Confirm: deposit of ${depositAmount} EGP has been paid`)}
+                  </span>
+                </label>
 
                 {/* Payment Proof Upload */}
                 <div className="mt-6 pt-6 border-t border-border">
                   <h3 className="font-semibold text-secondary mb-1 flex items-center gap-2">
                     <Upload className="w-4 h-4 text-primary" />
-                    {t('إثبات الدفع', 'Proof of Payment')}
+                    {t('إثبات دفع العربون', 'Proof of Payment')}
                     <span className="text-red-500">*</span>
                   </h3>
                   <p className="text-xs text-muted-foreground mb-4">
@@ -330,19 +334,24 @@ export function CheckoutPage() {
                   </p>
 
                   {proofPreview ? (
-                    <div className="relative inline-block">
-                      <img
-                        src={proofPreview}
-                        alt="proof"
-                        className="w-full max-w-xs h-48 object-cover rounded-xl border border-border"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeProof}
-                        className="absolute -top-2 -end-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow hover:bg-red-600"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
+                    <div className="space-y-4">
+                      <div className="relative inline-block">
+                        <img
+                          src={proofPreview}
+                          alt="proof"
+                          className="w-full max-w-xs h-48 object-cover rounded-xl border border-border"
+                        />
+                        <button
+                          type="button"
+                          onClick={removeProof}
+                          className="absolute -top-2 -end-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow hover:bg-red-600"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <p className="text-sm font-medium text-primary">
+                        {t('سيتم مراجعة الطلب مع خدمة العملاء و سيتم التواصل معك خلال 24 ساعة', 'Your request will be reviewed by customer service and we will contact you within 24 hours')}
+                      </p>
                     </div>
                   ) : (
                     <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
@@ -386,9 +395,7 @@ export function CheckoutPage() {
                     <Button variant="ghost" size="sm" onClick={() => setStep('payment')}>{t('تعديل', 'Edit')}</Button>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    {paymentMethod === 'cash' && <><Banknote className="w-5 h-5 text-primary" /><span>{t('كاش عند الاستلام — عربون 100 جنيه', 'Cash on Delivery — 100 EGP deposit')}</span></>}
-                    {paymentMethod === 'vodafone' && <><Smartphone className="w-5 h-5 text-red-600" /><span>{t('فودافون كاش', 'Vodafone Cash')} — {paymentData.vodafoneNumber}</span></>}
-                    {paymentMethod === 'bank' && <><CreditCard className="w-5 h-5 text-blue-600" /><span>{t('تحويل بنكي', 'Bank Transfer')}</span></>}
+                    {selectedMethod && <><CreditCard className="w-5 h-5 text-primary" /><span>{selectedMethod.name} {selectedMethod.number && `— ${selectedMethod.number}`}</span></>}
                   </div>
                 </div>
 
@@ -419,9 +426,14 @@ export function CheckoutPage() {
                   <div className="bg-white rounded-lg border border-border p-6">
                     <h3 className="font-medium text-secondary mb-3 flex items-center gap-2">
                       <Upload className="w-4 h-4 text-primary" />
-                      {t('إثبات الدفع', 'Proof of Payment')}
+                      {t('إثبات دفع العربون', 'Proof of Payment')}
                     </h3>
-                    <img src={proofPreview} alt="proof" className="w-40 h-28 object-cover rounded-lg border border-border" />
+                    <div className="space-y-3">
+                      <img src={proofPreview} alt="proof" className="w-40 h-28 object-cover rounded-lg border border-border" />
+                      <p className="text-sm font-medium text-primary">
+                        {t('سيتم مراجعة الطلب مع خدمة العملاء و سيتم التواصل معك خلال 24 ساعة', 'Your request will be reviewed by customer service and we will contact you within 24 hours')}
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -438,7 +450,7 @@ export function CheckoutPage() {
                   <ul className="text-muted-foreground space-y-1 list-disc list-inside">
                     <li>{t('سيتم التواصل معك خلال 24 ساعة لتأكيد الطلب', 'We will contact you within 24 hours to confirm')}</li>
                     <li>{t('مدة التوصيل من 3-7 أيام عمل', 'Delivery: 3-7 business days')}</li>
-                    {paymentMethod === 'cash' && <li>{t('سيتم خصم العربون من المبلغ الإجمالي عند الاستلام', 'Deposit deducted from total on delivery')}</li>}
+                    <li>{t('سيتم خصم العربون من المبلغ الإجمالي عند الاستلام', 'Deposit deducted from total on delivery')}</li>
                   </ul>
                 </div>
               </div>
@@ -502,15 +514,15 @@ export function CheckoutPage() {
                     <span className="font-bold">{t('الإجمالي', 'Total')}</span>
                     <span className="font-bold text-xl text-primary">{total.toLocaleString()} {t('جنيه', 'EGP')}</span>
                   </div>
-                  {paymentMethod === 'cash' && step !== 'info' && (
+                  {step !== 'info' && (
                     <div className="mt-3 pt-3 border-t border-border space-y-1 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t('المطلوب الآن:', 'Pay Now:')}</span>
-                        <span className="font-bold text-green-600">100 {t('جنيه', 'EGP')}</span>
+                        <span className="text-muted-foreground">{t('العربون الآن:', 'Pay Now:')}</span>
+                        <span className="font-bold text-green-600">{depositAmount.toLocaleString()} {t('جنيه', 'EGP')}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">{t('عند الاستلام:', 'On Delivery:')}</span>
-                        <span className="font-bold">{amountOnDelivery} {t('جنيه', 'EGP')}</span>
+                        <span className="font-bold">{remaining.toLocaleString()} {t('جنيه', 'EGP')}</span>
                       </div>
                     </div>
                   )}

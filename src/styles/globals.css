@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Noto+Sans+Arabic:wght@300;400;500;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -38,14 +38,14 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Tajawal', 'Noto Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 14px;
     line-height: 1.7;
     font-weight: 400;
   }
 
   h1 {
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Tajawal', sans-serif;
     font-size: 2.25rem;
     font-weight: 700;
     line-height: 1.2;
@@ -53,7 +53,7 @@
   }
 
   h2 {
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Tajawal', sans-serif;
     font-size: 1.875rem;
     font-weight: 700;
     line-height: 1.3;
@@ -61,7 +61,7 @@
   }
 
   h3 {
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Tajawal', sans-serif;
     font-size: 1.375rem;
     font-weight: 600;
     line-height: 1.4;
@@ -69,7 +69,7 @@
   }
 
   h4 {
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Tajawal', sans-serif;
     font-size: 1.125rem;
     font-weight: 600;
     line-height: 1.5;

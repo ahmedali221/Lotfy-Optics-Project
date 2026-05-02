@@ -71,16 +71,25 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
       </button>
 
       {/* Image */}
-      <div className="aspect-square overflow-hidden bg-gray-100">
-        {product.image ? (
+      <div className="aspect-square overflow-hidden bg-gray-100 relative">
+        {product.images?.[0]?.image ? (
           <img
-            src={resolveImageUrl(product.image)}
+            src={resolveImageUrl(product.images[0].image)}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300">
             <span className="text-6xl">👓</span>
+          </div>
+        )}
+        {product.lens_type && (
+          <div className="absolute bottom-2 start-2">
+            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-primary text-white shadow-sm">
+              {product.lens_type === 'medical' 
+                ? (language === 'ar' ? 'طبية' : 'Medical') 
+                : (language === 'ar' ? 'شمسية' : 'Sun')}
+            </span>
           </div>
         )}
       </div>

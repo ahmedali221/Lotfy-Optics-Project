@@ -109,14 +109,66 @@ export function ContactPage() {
                   </div>
                   <div>
                     <h4 className="mb-2">
-                      {language === 'ar' ? 'موقعنا' : 'Our Location'}
+                      {language === 'ar' ? 'الفرع الأول' : 'Branch 1'}
                     </h4>
-                    <p className="text-muted-foreground">
-                      {language === 'ar' ? 'أسيوط - فريال' : 'Assiut - Ferial'}
-                      <br />
-                      {language === 'ar' ? 'أسيوط - الحقوقيين' : 'Assiut - Hoqoqyin'}
-                    </p>
+                    <a
+                      href="https://www.google.com/maps/place/Lotfy+optics+Assuit/@27.1902185,31.1852709,17z/data=!3m1!4b1!4m6!3m5!1s0x14450b064060496b:0x3d69b9b67b0f290c!8m2!3d27.1902185!4d31.182696!16s%2Fg%2F11fq5jp4df?entry=tts&g_ep=EgoyMDI2MDQyOC4wIPu8ASoASAFQAw%3D%3D&skid=b1bad7ef-5e21-4534-ae10-81177cc6c9ad"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {language === 'ar'
+                        ? 'أسيوط شركه فريال، خلف النساجون الشرقيون للسجاد وبجوار مكتب بريد، قسم ثان أسيوط، محافظة أسيوط'
+                        : 'Assiut, Ferial Company, behind Al-Nassajoun Al-Sharqioun carpet store, next to post office, 2nd district, Assiut Governorate'}
+                    </a>
                   </div>
+                </div>
+                <div className="mt-4 rounded-lg overflow-hidden">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d982.3!2d31.182696!3d27.1902185!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14450b064060496b%3A0x3d69b9b67b0f290c!2sLotfy%20optics%20Assuit!5e0!3m2!1sar!2seg!4v1714650000000!5m2!1sar!2seg"
+                    width="100%"
+                    height="200"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={language === 'ar' ? 'موقع الفرع الأول' : 'Branch 1 Location'}
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="mb-2">
+                      {language === 'ar' ? 'الفرع الثاني' : 'Branch 2'}
+                    </h4>
+                    <a
+                      href="https://www.google.com/maps?q=27.196409225463867,31.179893493652344&z=17&hl=en"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {language === 'ar'
+                        ? 'أسيوط، مدخل تقسيم الحقوقيين، برج الفيروز، خلف مساكن عزبة السجن، بجوار برج الحرية'
+                        : 'Assiut, entrance of Hoqoqyin division, Al-Fayroz Tower, behind Ozbet El-Segn residences, next to Al-Horeya Tower'}
+                    </a>
+                  </div>
+                </div>
+                <div className="mt-4 rounded-lg overflow-hidden">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d982.3!2d31.179893!3d27.196409!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sar!2seg!4v1714650000000!5m2!1sar!2seg"
+                    width="100%"
+                    height="200"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={language === 'ar' ? 'موقع الفرع الثاني' : 'Branch 2 Location'}
+                  />
                 </div>
               </div>
             </div>

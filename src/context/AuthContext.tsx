@@ -51,7 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (name: string, phone: string, email: string, password: string) => {
-    await api.post('/api/auth/signup/', { name, phone, email, password });
+    // Use plain axios (no auth interceptor) so an expired token in localStorage
+    // doesn't cause SimpleJWT to reject the unauthenticated signup request with 401.
+    await axios.post(`${BASE_URL}/api/auth/signup/`, { name, phone, email, password });
     await login(email, password);
   };
 

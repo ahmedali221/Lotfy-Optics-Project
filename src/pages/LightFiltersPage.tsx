@@ -1,65 +1,78 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { ProductCard } from '../components/products/ProductCard';
-import { AdvancedFilter } from '../components/products/AdvancedFilter';
-import { getProductsByCategory, getBrands, getMaxPrice } from '../data/products';
-import { Check, Phone, Info, CheckCircle, Search } from 'lucide-react';
-import { Input } from '../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { ApiProductCard } from '../components/products/ApiProductCard';
+import { Check, Phone, CheckCircle, Search, Filter, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router';
+import api from '../lib/axios';
+import { ApiProduct, ApiProductPage, ApiBrand } from '../types/api';
+
 const heroImage = 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=1600&h=900&fit=crop';
 
+const FRAME_SHAPES = [
+  { value: 'square',    ar: 'مربع',    en: 'Square'    },
+  { value: 'rectangle', ar: 'مستطيل', en: 'Rectangle' },
+  { value: 'round',     ar: 'دائري',  en: 'Round'     },
+  { value: 'cat_eye',   ar: 'كات آي', en: 'Cat Eye'   },
+  { value: 'oval',      ar: 'بيضاوي', en: 'Oval'      },
+];
+
 export function LightFiltersPage() {
-  const { t, language } = useLanguage();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('name');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedFrameShapes, setSelectedFrameShapes] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const { language } = useLanguage();
+  const tl = (ar: string, en: string) => language === 'ar' ? ar : en;
 
-  const allProducts = getProductsByCategory('filters');
-  const brands = getBrands('filters');
-  const maxPrice = getMaxPrice('filters');
+  const [products, setProducts] = useState<ApiProduct[]>([]);
+  const [brands, setBrands] = useState<ApiBrand[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
+  const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [search, setSearch] = useState('');
+  const [ordering, setOrdering] = useState('');
 
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let filtered = allProducts.filter(product => {
-      const matchesSearch = 
-        product.name[language].toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description[language].toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (product.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-      
-      const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
-      const matchesBrand = selectedBrands.length === 0 || (product.brand && selectedBrands.includes(product.brand));
-      const matchesShape = selectedFrameShapes.length === 0 || (product.frameShape && selectedFrameShapes.includes(product.frameShape));
-      const matchesColor = selectedColors.length === 0 || (product.frameColor && selectedColors.some(color => product.frameColor?.includes(color)));
-      
-      return matchesSearch && matchesPrice && matchesBrand && matchesShape && matchesColor;
-    });
+  useEffect(() => {
+    api.get('/api/catalog/brands/', { params: { page_size: 100 } })
+      .then(({ data }) => setBrands(data.results ?? data))
+      .catch(() => {});
+  }, []);
 
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.name[language].localeCompare(b.name[language]);
-        case 'name-desc':
-          return b.name[language].localeCompare(a.name[language]);
-        case 'price':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        case 'rating':
-          return a.rating - b.rating;
-        case 'rating-desc':
-          return b.rating - a.rating;
-        default:
-          return 0;
-      }
-    });
+  const fetchProducts = useCallback(() => {
+    setLoading(true);
+    const params: Record<string, string | number> = { category: 'light_filters', page_size: 100 };
 
-    return filtered;
-  }, [allProducts, searchTerm, priceRange, selectedBrands, selectedFrameShapes, selectedColors, sortBy, language]);
+    if (minPrice) params.min_price = minPrice;
+    if (maxPrice) params.max_price = maxPrice;
+    if (search) params.name = search;
+    if (ordering) params.ordering = ordering;
+    api.get<ApiProductPage>('/api/catalog/products/', { params })
+      .then(({ data }) => {
+        let results = data.results ?? (data as unknown as ApiProduct[]);
+        if (selectedBrands.length > 0) results = results.filter(p => p.brand && selectedBrands.includes(p.brand.id));
+        if (selectedShapes.length > 0) results = results.filter(p => p.frame_shape && selectedShapes.includes(p.frame_shape));
+        setProducts(results);
+      })
+      .catch(() => setProducts([]))
+      .finally(() => setLoading(false));
+  }, [selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);
+
+  useEffect(() => {
+    const timer = setTimeout(fetchProducts, 300);
+    return () => clearTimeout(timer);
+  }, [fetchProducts]);
+
+  const toggleBrand = (id: number) =>
+    setSelectedBrands(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]);
+  const toggleShape = (v: string) =>
+    setSelectedShapes(prev => prev.includes(v) ? prev.filter(s => s !== v) : [...prev, v]);
+  const resetFilters = () => {
+    setSelectedBrands([]);
+    setSelectedShapes([]);
+    setMinPrice('');
+    setMaxPrice('');
+    setSearch('');
+    setOrdering('');
+  };
 
   const features = [
     {
@@ -250,80 +263,178 @@ export function LightFiltersPage() {
       <div className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="text-center mb-8">
-            {language === 'ar' ? 'منتجاتنا' : 'Our Products'}
+            {tl('منتجاتنا', 'Our Products')}
           </h2>
 
+          {/* Mobile filter toggle */}
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={() => setShowFilters(v => !v)}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-border rounded-lg shadow-sm text-sm font-medium"
+            >
+              <Filter className="w-4 h-4" />
+              {tl('الفلاتر', 'Filters')}
+              <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Sidebar Filters */}
-            <div className="lg:col-span-1">
-              <AdvancedFilter
-                priceRange={priceRange}
-                onPriceRangeChange={setPriceRange}
-                selectedBrands={selectedBrands}
-                onBrandsChange={setSelectedBrands}
-                selectedGenders={[]}
-                onGendersChange={() => {}}
-                selectedFrameShapes={selectedFrameShapes}
-                onFrameShapesChange={setSelectedFrameShapes}
-                selectedColors={selectedColors}
-                onColorsChange={setSelectedColors}
-                brands={brands}
-                maxPrice={maxPrice}
-                showGenderFilter={false}
-                showFrameShapeFilter={true}
-                showColorFilter={true}
-              />
+            {/* Sidebar */}
+            <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+              <div className="bg-white rounded-lg shadow-md p-4 space-y-6 sticky top-4">
+
+
+                {/* Sort */}
+                <div>
+                  <label className="block text-sm font-semibold mb-2">{tl('الترتيب', 'Sort By')}</label>
+                  <select
+                    value={ordering}
+                    onChange={e => setOrdering(e.target.value)}
+                    className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">{tl('الافتراضي', 'Default')}</option>
+                    <option value="price">{tl('السعر: الأقل أولاً', 'Price: Low to High')}</option>
+                    <option value="-price">{tl('السعر: الأعلى أولاً', 'Price: High to Low')}</option>
+                    <option value="name">{tl('الاسم: أ-ي', 'Name: A-Z')}</option>
+                    <option value="-name">{tl('الاسم: ي-أ', 'Name: Z-A')}</option>
+                  </select>
+                </div>
+
+                {/* Price Range */}
+                <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
+                  <h3 className="font-bold mb-4 text-sm">{tl('السعر', 'Price')}</h3>
+                  
+                  <div className="px-2 mb-6">
+                    <div className="relative h-1.5 bg-gray-200 rounded-full">
+                      <div className="absolute top-0 bottom-0 left-0 right-0 bg-primary/30 rounded-full"></div>
+                      <div className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary border-2 border-white rounded-full shadow-md cursor-pointer ${language === 'ar' ? 'right-0' : 'left-0'}`}></div>
+                    </div>
+                    <div className="flex justify-between mt-3 text-[10px] text-muted-foreground font-medium">
+                      <span>{tl('0 جنيه', '0 EGP')}</span>
+                      <span>{tl('5000 جنيه', '5000 EGP')}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <button 
+                      onClick={() => { setMinPrice(''); setMaxPrice('500'); }}
+                      className={`w-full py-2.5 px-4 text-xs rounded-xl border transition-all ${minPrice === '' && maxPrice === '500' ? 'bg-primary/5 border-primary text-primary font-bold' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-600'}`}
+                    >
+                      {tl('أقل من 500 جنيه', 'Less than 500 EGP')}
+                    </button>
+                    <button 
+                      onClick={() => { setMinPrice('500'); setMaxPrice('1000'); }}
+                      className={`w-full py-2.5 px-4 text-xs rounded-xl border transition-all ${minPrice === '500' && maxPrice === '1000' ? 'bg-primary/5 border-primary text-primary font-bold' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-600'}`}
+                    >
+                      {tl('500 - 1000 جنيه', '500 - 1000 EGP')}
+                    </button>
+                    <button 
+                      onClick={() => { setMinPrice('1000'); setMaxPrice('1500'); }}
+                      className={`w-full py-2.5 px-4 text-xs rounded-xl border transition-all ${minPrice === '1000' && maxPrice === '1500' ? 'bg-primary/5 border-primary text-primary font-bold' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-600'}`}
+                    >
+                      {tl('1000 - 1500 جنيه', '1000 - 1500 EGP')}
+                    </button>
+                    <button 
+                      onClick={() => { setMinPrice('1500'); setMaxPrice(''); }}
+                      className={`w-full py-2.5 px-4 text-xs rounded-xl border transition-all ${minPrice === '1500' && maxPrice === '' ? 'bg-primary/5 border-primary text-primary font-bold' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-600'}`}
+                    >
+                      {tl('أكثر من 1500 جنيه', 'More than 1500 EGP')}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Brands */}
+                {brands.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">{tl('الماركة', 'Brand')}</label>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {brands.map(b => (
+                        <label key={b.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={selectedBrands.includes(b.id)}
+                            onChange={() => toggleBrand(b.id)}
+                            className="rounded text-primary"
+                          />
+                          {b.name}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Frame Shapes */}
+                <div>
+                  <label className="block text-sm font-semibold mb-2">{tl('شكل الإطار', 'Frame Shape')}</label>
+                  <div className="space-y-2">
+                    {FRAME_SHAPES.map(s => (
+                      <label key={s.value} className="flex items-center gap-2 cursor-pointer text-sm">
+                        <input
+                          type="checkbox"
+                          checked={selectedShapes.includes(s.value)}
+                          onChange={() => toggleShape(s.value)}
+                          className="rounded text-primary"
+                        />
+                        {language === 'ar' ? s.ar : s.en}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Reset */}
+                <button
+                  onClick={resetFilters}
+                  className="w-full text-sm text-primary underline hover:no-underline"
+                >
+                  {tl('إعادة ضبط الفلاتر', 'Reset Filters')}
+                </button>
+              </div>
             </div>
 
             {/* Products Grid */}
             <div className="lg:col-span-3">
-              {/* Search and Sort Bar */}
-              <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4`} />
-                    <Input
-                      placeholder={t('filter.search')}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className={language === 'ar' ? 'pr-10' : 'pl-10'}
-                    />
-                  </div>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-full md:w-[200px]">
-                      <SelectValue placeholder={t('filter.sortBy')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="name">{t('filter.sortName')}</SelectItem>
-                      <SelectItem value="name-desc">{t('filter.sortNameDesc')}</SelectItem>
-                      <SelectItem value="price">{t('filter.sortPriceLow')}</SelectItem>
-                      <SelectItem value="price-desc">{t('filter.sortPriceHigh')}</SelectItem>
-                      <SelectItem value="rating">{t('filter.sortRatingLow')}</SelectItem>
-                      <SelectItem value="rating-desc">{t('filter.sortRatingHigh')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Results Count */}
-              <div className="mb-6">
-                <p className="text-sm text-muted-foreground">
-                  {t('products.showing')} {filteredProducts.length} {t('products.of')} {allProducts.length} {t('products.products')}
-                </p>
-              </div>
-
-              {/* Products */}
-              {filteredProducts.length > 0 ? (
+              {loading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                      <div className="aspect-square bg-gray-200" />
+                      <div className="p-4 space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-3/4" />
+                        <div className="h-4 bg-gray-200 rounded w-1/2" />
+                      </div>
+                    </div>
                   ))}
                 </div>
+              ) : products.length > 0 ? (
+                <>
+                  <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="relative flex-1 max-w-md">
+                      <Search className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
+                      <input
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder={tl('ابحث عن الفلاتر الضوئية...', 'Search for light filters...')}
+                        className={`w-full ${language === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 bg-white border border-border rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all`}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground whitespace-nowrap">
+                      {tl(`${products.length} منتج`, `${products.length} products`)}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map(p => (
+                      <ApiProductCard key={p.id} product={p} />
+                    ))}
+                  </div>
+                </>
               ) : (
-                <div className="text-center py-16">
+                <div className="text-center py-16 bg-white rounded-lg shadow-md">
                   <p className="text-muted-foreground text-lg">
-                    {t('products.noResults')}
+                    {tl('لا توجد منتجات مطابقة', 'No products found')}
                   </p>
+                  <button onClick={resetFilters} className="mt-4 text-primary underline text-sm">
+                    {tl('إعادة ضبط الفلاتر', 'Reset Filters')}
+                  </button>
                 </div>
               )}
             </div>
