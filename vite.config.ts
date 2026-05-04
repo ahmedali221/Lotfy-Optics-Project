@@ -69,5 +69,12 @@ function figmaAssetResolver() {
     server: {
       port: 3000,
       open: true,
+      proxy: {
+        '/api/proxy': {
+          target: 'https://34.18.200.186.sslip.io',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/proxy/, ''),
+        },
+      },
     },
   });
