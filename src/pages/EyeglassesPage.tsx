@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { ApiProductCard } from '../components/products/ApiProductCard';
 import { Filter, ChevronDown, Search } from 'lucide-react';
@@ -28,19 +29,15 @@ const FRAME_SHAPES = [
   { value: 'oval',      ar: 'بيضاوي', en: 'Oval'      },
 ];
 
-const LENS_TYPES = [
-  { value: 'medical',    ar: 'طبية',   en: 'Medical'    },
-  { value: 'sunglasses', ar: 'شمسية', en: 'Sunglasses' },
-];
-
 export function EyeglassesPage() {
   const { language } = useLanguage();
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') === 'sunglasses' ? 'sunglasses' : 'medical';
 
   const [activeGender, setActiveGender] = useState('all');
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
   const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
-  const [selectedLensTypes, setSelectedLensTypes] = useState<string[]>([]);
   const [selectedColours, setSelectedColours] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
@@ -62,11 +59,11 @@ export function EyeglassesPage() {
     setLoading(true);
     const params: Record<string, string | number> = {
       category: 'glasses',
+      lens_type: activeTab,
       page_size: 100,
       is_active: 'true',
     };
     if (GENDER_MAP[activeGender]) params.gender = GENDER_MAP[activeGender];
-
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
@@ -76,7 +73,7 @@ export function EyeglassesPage() {
       .then(({ data }) => setProducts(data.results ?? (data as unknown as ApiProduct[])))
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [activeGender, selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);
+  }, [activeTab, activeGender, selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);
 
   useEffect(() => {
     const timer = setTimeout(fetchProducts, 300);
@@ -88,7 +85,6 @@ export function EyeglassesPage() {
   const filtered = products.filter(p => {
     if (selectedBrands.length > 0 && !(p.brand && selectedBrands.includes(p.brand.id))) return false;
     if (selectedShapes.length > 0 && !(p.frame_shape && selectedShapes.includes(p.frame_shape))) return false;
-    if (selectedLensTypes.length > 0 && !(p.lens_type && selectedLensTypes.includes(p.lens_type))) return false;
     if (selectedColours.length > 0 && !selectedColours.includes(p.colour)) return false;
     return true;
   });
@@ -99,9 +95,6 @@ export function EyeglassesPage() {
   const toggleShape = (v: string) =>
     setSelectedShapes(prev => prev.includes(v) ? prev.filter(s => s !== v) : [...prev, v]);
 
-  const toggleLensType = (v: string) =>
-    setSelectedLensTypes(prev => prev.includes(v) ? prev.filter(lt => lt !== v) : [...prev, v]);
-
   const toggleColour = (v: string) =>
     setSelectedColours(prev => prev.includes(v) ? prev.filter(c => c !== v) : [...prev, v]);
 
@@ -109,7 +102,6 @@ export function EyeglassesPage() {
     setActiveGender('all');
     setSelectedBrands([]);
     setSelectedShapes([]);
-    setSelectedLensTypes([]);
     setSelectedColours([]);
     setMinPrice('');
     setMaxPrice('');
@@ -125,14 +117,36 @@ export function EyeglassesPage() {
         <div className="absolute inset-0 bg-secondary/70" />
         <div className="container mx-auto px-4 relative z-10 text-center text-white">
           <div className="inline-block mb-4 px-5 py-1.5 bg-primary/20 border border-primary/30 rounded-full text-sm text-primary">
-            {t('✨ نظارات طبية عالية الجودة', '✨ Premium Prescription Eyewear')}
+            {activeTab === 'sunglasses'
+              ? t('✨ نظارات شمسية عالية الجودة', '✨ Premium Sunglasses')
+              : t('✨ نظارات طبية عالية الجودة', '✨ Premium Prescription Eyewear')}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            {t('نظارات طبية للرؤية الواضحة', 'Prescription Glasses for Clear Vision')}
+            {activeTab === 'sunglasses'
+              ? t('نظارات شمسية بأحدث التصاميم', 'Sunglasses with the Latest Designs')
+              : t('نظارات طبية للرؤية الواضحة', 'Prescription Glasses for Clear Vision')}
           </h1>
           <p className="text-lg text-white/85 max-w-2xl mx-auto">
-            {t('اختر من بين مجموعة واسعة من الإطارات الطبية العصرية', 'Choose from a wide range of modern prescription frames')}
+            {activeTab === 'sunglasses'
+              ? t('اختر من بين مجموعة واسعة من النظارات الشمسية العصرية', 'Choose from a wide range of modern sunglasses')
+              : t('اختر من بين مجموعة واسعة من الإطارات الطبية العصرية', 'Choose from a wide range of modern prescription frames')}
           </p>
+
+          {/* Tab Switcher */}
+          <div className="mt-8 inline-flex bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-1">
+            <button
+              className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'medical' ? 'bg-primary text-white shadow-lg' : 'text-white/80 hover:text-white'}`}
+              onClick={() => setSearchParams({})}
+            >
+              {t('نظارات النظر', 'Prescription')}
+            </button>
+            <button
+              className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'sunglasses' ? 'bg-primary text-white shadow-lg' : 'text-white/80 hover:text-white'}`}
+              onClick={() => setSearchParams({ tab: 'sunglasses' })}
+            >
+              {t('نظارات الشمس', 'Sunglasses')}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -270,24 +284,6 @@ export function EyeglassesPage() {
                         className="w-4 h-4 text-primary focus:ring-primary rounded"
                       />
                       <span className="text-sm group-hover:text-primary transition-colors">{language === 'ar' ? s.ar : s.en}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Lens Type */}
-              <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
-                <h3 className="font-bold mb-3 text-sm">{t('نوع النظارة', 'Lens Type')}</h3>
-                <div className="space-y-2">
-                  {LENS_TYPES.map(lt => (
-                    <label key={lt.value} className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={selectedLensTypes.includes(lt.value)}
-                        onChange={() => toggleLensType(lt.value)}
-                        className="w-4 h-4 text-primary focus:ring-primary rounded"
-                      />
-                      <span className="text-sm group-hover:text-primary transition-colors">{language === 'ar' ? lt.ar : lt.en}</span>
                     </label>
                   ))}
                 </div>

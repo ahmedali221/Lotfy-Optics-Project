@@ -1,11 +1,127 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { ArrowLeft, Clock, Calendar, Tag, Share2, Facebook, Twitter, Linkedin, Eye, TrendingUp } from 'lucide-react';
+import api from '../lib/axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://165.227.137.145:8080';
+
+function resolveDetailImage(url: string | null | undefined): string {
+  if (!url) return 'https://images.unsplash.com/photo-1606811801193-e318c9a87ad7?w=1200&h=600&fit=crop';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
+interface ApiArticleSection { title: string; description: string; sort_order: number; }
+interface ApiFetchedArticle {
+  id: number;
+  title: string;
+  subtitle: string;
+  image: string | null;
+  author: string;
+  minutes_to_read: number;
+  published_date: string;
+  sections: ApiArticleSection[];
+}
 
 export function ArticleDetailPage() {
   const { id } = useParams();
   const { language } = useLanguage();
+
+  const [apiArticle, setApiArticle] = useState<ApiFetchedArticle | null>(null);
+  const [apiLoading, setApiLoading] = useState(false);
+
+  const isApiArticle = id?.startsWith('api-');
+  const numericId = isApiArticle ? id?.replace('api-', '') : null;
+
+  useEffect(() => {
+    if (!numericId) return;
+    setApiLoading(true);
+    api.get(`/api/articles/${numericId}/`)
+      .then(({ data }) => setApiArticle(data))
+      .catch(() => setApiArticle(null))
+      .finally(() => setApiLoading(false));
+  }, [numericId]);
+
+  // If this is an API article, render a dedicated view
+  if (isApiArticle) {
+    if (apiLoading) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">{language === 'ar' ? 'جارٍ التحميل...' : 'Loading...'}</p>
+          </div>
+        </div>
+      );
+    }
+    if (!apiArticle) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="mb-2">{language === 'ar' ? 'المقال غير موجود' : 'Article not found'}</h2>
+            <Link to="/articles" className="text-primary hover:underline text-sm">{language === 'ar' ? 'العودة للمقالات' : 'Back to Articles'}</Link>
+          </div>
+        </div>
+      );
+    }
+    const formatDate = (d: string) => {
+      try {
+        return new Date(d).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch { return d; }
+    };
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Hero */}
+        <div className="relative h-[50vh] min-h-[350px] overflow-hidden">
+          <img src={resolveDetailImage(apiArticle.image)} alt={apiArticle.title} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/70 to-transparent" />
+          <div className="absolute top-8 left-0 right-0 z-10">
+            <div className="container mx-auto px-4">
+              <Link to="/articles" className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm">
+                <ArrowLeft className="w-4 h-4" style={{ transform: language === 'ar' ? 'scaleX(-1)' : 'none' }} />
+                {language === 'ar' ? 'العودة للمقالات' : 'Back to Articles'}
+              </Link>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 z-10 pb-10">
+            <div className="container mx-auto px-4 max-w-4xl">
+              <div className="flex items-center gap-4 text-white/80 text-sm mb-3">
+                <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{formatDate(apiArticle.published_date)}</span>
+                <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" />{apiArticle.minutes_to_read} {language === 'ar' ? 'دقائق' : 'min'}</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{apiArticle.title}</h1>
+              <p className="text-white/80">{language === 'ar' ? 'بقلم' : 'By'} {apiArticle.author}</p>
+            </div>
+          </div>
+        </div>
+        {/* Content */}
+        <div className="container mx-auto px-4 py-12 max-w-4xl">
+          {apiArticle.subtitle && (
+            <p className="text-lg text-muted-foreground mb-8 leading-relaxed border-r-4 border-primary pr-4">{apiArticle.subtitle}</p>
+          )}
+          {apiArticle.sections.length > 0 ? (
+            <div className="space-y-8">
+              {apiArticle.sections.map((section, i) => (
+                <div key={i}>
+                  {section.title && <h2 className="text-2xl font-bold text-secondary mb-3">{section.title}</h2>}
+                  <p className="text-secondary/80 leading-relaxed whitespace-pre-line">{section.description}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">{language === 'ar' ? 'لا يوجد محتوى بعد.' : 'No content yet.'}</p>
+          )}
+          <div className="mt-12 pt-8 border-t border-border">
+            <Link to="/articles" className="inline-flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-colors">
+              <ArrowLeft className="w-4 h-4" style={{ transform: language === 'ar' ? 'scaleX(-1)' : 'none' }} />
+              {language === 'ar' ? 'العودة لجميع المقالات' : 'Back to all articles'}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // All articles with full content
   const articles = [

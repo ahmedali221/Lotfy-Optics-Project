@@ -1,3 +1,65 @@
+import { useLanguage } from '../context/LanguageContext';
+import { Stethoscope } from 'lucide-react';
+
+export function ClinicsPage() {
+  const { language } = useLanguage();
+
+  return (
+    <div className="min-h-[80vh] flex items-center justify-center bg-background px-4">
+      <div className="max-w-2xl w-full text-center">
+        <div className="inline-flex p-6 bg-primary/10 rounded-full mb-8 animate-bounce">
+          <Stethoscope className="w-16 h-16 text-primary" />
+        </div>
+        
+        <h1 className="text-4xl md:text-6xl font-bold text-secondary mb-6 tracking-tight">
+          {language === 'ar' ? 'قريباً جداً' : 'Coming Soon'}
+        </h1>
+        
+        <div className="h-1.5 w-24 bg-primary mx-auto mb-8 rounded-full" />
+        
+        <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
+          {language === 'ar' 
+            ? 'نحن نعمل على تجهيز عياداتنا بأحدث التقنيات لنقدم لكم أفضل رعاية طبية لعيونكم. انتظرونا قريباً!' 
+            : "We are currently equipping our clinics with the latest technologies to provide you with the best medical care for your eyes. Stay tuned!"}
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+          {[
+            { 
+              ar: 'فحص شامل', 
+              en: 'Comprehensive Exam',
+              desc_ar: 'أحدث أجهزة قياس النظر',
+              desc_en: 'Latest vision measurement devices'
+            },
+            { 
+              ar: 'فحص قاع العين', 
+              en: 'Retinal Exam',
+              desc_ar: 'تشخيص دقيق لمشاكل الشبكية',
+              desc_en: 'Accurate diagnosis for retinal issues'
+            },
+            { 
+              ar: 'ضغط العين', 
+              en: 'Eye Pressure',
+              desc_ar: 'متابعة دورية لضغط العين',
+              desc_en: 'Regular eye pressure monitoring'
+            }
+          ].map((item, i) => (
+            <div key={i} className="p-6 bg-white rounded-2xl shadow-sm border border-border/50 hover:shadow-md transition-shadow text-center">
+              <h3 className="text-lg font-bold mb-2 text-secondary">
+                {language === 'ar' ? item.ar : item.en}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {language === 'ar' ? item.desc_ar : item.desc_en}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Old Implementation - Reverted and Commented
 import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Calendar, Clock, Stethoscope, Eye, Activity, Glasses, Baby, Droplets } from 'lucide-react';
@@ -6,7 +68,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner@2.0.3';
 
-export function ClinicsPage() {
+export function ClinicsPageOld() {
   const { t, language } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
@@ -99,7 +161,6 @@ export function ClinicsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
       <div 
         className="relative h-[400px] bg-cover bg-center"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1663151064065-cb334788f77d?w=1200&h=400&fit=crop)' }}
@@ -113,7 +174,6 @@ export function ClinicsPage() {
         </div>
       </div>
 
-      {/* Services Grid */}
       <div className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-center mb-12">{t('clinics.services')}</h2>
@@ -134,7 +194,6 @@ export function ClinicsPage() {
         </div>
       </div>
 
-      {/* Equipment Section */}
       <div className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="text-center mb-12">
@@ -151,7 +210,6 @@ export function ClinicsPage() {
         </div>
       </div>
 
-      {/* Booking Form */}
       <div className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
@@ -254,3 +312,4 @@ export function ClinicsPage() {
     </div>
   );
 }
+*/

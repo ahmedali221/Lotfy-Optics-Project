@@ -3,7 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
-import { ShoppingCart, Heart, Menu, X, ChevronDown, Aperture, Glasses, Search, User, LogOut, LogIn, Eye, Rainbow } from 'lucide-react';
+import { ShoppingCart, Heart, Menu, X, ChevronDown, Aperture, Glasses, Search, User, LogOut, LogIn, Eye, Rainbow, Sun } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { AuthModal } from '../auth/AuthModal';
 import logo from '../../assets/logo.png';
@@ -37,9 +37,15 @@ export function Navbar() {
   const productCategories = [
     {
       path: '/eyeglasses',
-      label: t('nav.eyeglasses'), // "نظارات"
+      label: language === 'ar' ? 'نظارات النظر' : 'Prescription Glasses',
       icon: Glasses,
       color: 'text-blue-600'
+    },
+    {
+      path: '/eyeglasses?tab=sunglasses',
+      label: language === 'ar' ? 'نظارات الشمس' : 'Sunglasses',
+      icon: Sun,
+      color: 'text-amber-500'
     },
     {
       path: '/lenses',
@@ -67,8 +73,7 @@ export function Navbar() {
   ];
 
   const otherNavLinks = [
-    // No API endpoint — commented until backend adds clinic/article data
-    // { path: '/clinics', label: t('nav.clinics') },
+    { path: '/clinics', label: t('nav.clinics') },
     { path: '/articles', label: t('nav.articles') },
     { path: '/contact', label: t('nav.contact') },
   ];

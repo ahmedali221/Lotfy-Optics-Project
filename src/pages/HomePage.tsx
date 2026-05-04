@@ -12,6 +12,7 @@ export function HomePage() {
   const { t, language } = useLanguage();
   const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [brandNames, setBrandNames] = useState<string[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -19,6 +20,15 @@ export function HomePage() {
       .then(({ data }) => setFeaturedProducts(data.results ?? data))
       .catch(() => { })
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    api.get('/api/catalog/brands/', { params: { page_size: 100 } })
+      .then(({ data }) => {
+        const names: string[] = (data.results ?? data).map((b: { name: string }) => b.name).filter(Boolean);
+        if (names.length > 0) setBrandNames(names);
+      })
+      .catch(() => {});
   }, []);
 
   const features = [
@@ -373,6 +383,7 @@ export function HomePage() {
           </div>
 
           {/* Scrolling Brands */}
+          {brandNames.length > 0 && (
           <div className="relative">
             {/* Gradient Overlays */}
             <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10"></div>
@@ -381,7 +392,7 @@ export function HomePage() {
             {/* Scrolling Container */}
             <div className="flex gap-16 animate-scroll">
               {/* First Set */}
-              {['Ray-Ban', 'Gucci', 'Fendi', 'Police', 'Ralph Lauren', 'Prada', 'Versace', 'Dior'].map((brand, index) => (
+              {brandNames.map((brand, index) => (
                 <div key={`first-${index}`} className="flex-shrink-0">
                   <h4 className="text-2xl font-bold text-muted-foreground whitespace-nowrap">
                     {brand}
@@ -389,7 +400,7 @@ export function HomePage() {
                 </div>
               ))}
               {/* Duplicate Set for Seamless Loop */}
-              {['Ray-Ban', 'Gucci', 'Fendi', 'Police', 'Ralph Lauren', 'Prada', 'Versace', 'Dior'].map((brand, index) => (
+              {brandNames.map((brand, index) => (
                 <div key={`second-${index}`} className="flex-shrink-0">
                   <h4 className="text-2xl font-bold text-muted-foreground whitespace-nowrap">
                     {brand}
@@ -398,6 +409,7 @@ export function HomePage() {
               ))}
             </div>
           </div>
+          )}
 
           <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground">

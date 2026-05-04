@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, Navigate } from 'react-router';
 import { Layout } from './components/layout/Layout';
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
@@ -30,6 +30,7 @@ export const router = createBrowserRouter([
       { index: true, Component: HomePage },
       { path: 'about', Component: AboutPage },
       { path: 'lenses', Component: LensesPage },
+      { path: 'sunglasses', element: <Navigate to="/eyeglasses?tab=sunglasses" replace /> },
       { path: 'eyeglasses', Component: EyeglassesPage },
       { path: 'eyeglasses/:category', Component: EyeglassesSubPage },
       { path: 'artificial-eyes', Component: ArtificialEyesPage },

@@ -1,9 +1,30 @@
 import { useLanguage } from '../context/LanguageContext';
 import { Calendar, User, ArrowRight, Search, Clock, Eye, TrendingUp, Tag } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import api from '../lib/axios';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://165.227.137.145:8080';
+
+function resolveArticleImage(url: string | null | undefined): string {
+  if (!url) return 'https://images.unsplash.com/photo-1606811801193-e318c9a87ad7?w=800&h=600&fit=crop';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
+function formatDateBilingual(dateStr: string): { ar: string; en: string } {
+  try {
+    const d = new Date(dateStr);
+    return {
+      ar: d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' }),
+      en: d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+    };
+  } catch {
+    return { ar: dateStr, en: dateStr };
+  }
+}
 
 interface Article {
   id: string;
@@ -311,6 +332,37 @@ export function ArticlesPage() {
   const { language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [apiArticles, setApiArticles] = useState<Article[]>([]);
+
+  useEffect(() => {
+    api.get('/api/articles/', { params: { page_size: 100 } })
+      .then(({ data }) => {
+        const results = data.results ?? data;
+        const mapped: Article[] = results.map((a: {
+          id: number;
+          title: string;
+          subtitle: string;
+          image: string | null;
+          author: string;
+          minutes_to_read: number;
+          published_date: string;
+        }) => ({
+          id: `api-${a.id}`,
+          slug: `api-${a.id}`,
+          title: { ar: a.title, en: a.title },
+          excerpt: { ar: a.subtitle, en: a.subtitle },
+          author: { ar: a.author, en: a.author },
+          date: formatDateBilingual(a.published_date),
+          category: { ar: 'مقالات', en: 'Articles' },
+          categoryColor: 'primary',
+          image: resolveArticleImage(a.image),
+          readTime: { ar: `${a.minutes_to_read} دقائق قراءة`, en: `${a.minutes_to_read} min read` },
+          views: 0,
+        }));
+        setApiArticles(mapped);
+      })
+      .catch(() => {});
+  }, []);
 
   const categories = [
     { value: 'all', label: { ar: 'جميع المقالات', en: 'All Articles' } },
@@ -322,15 +374,17 @@ export function ArticlesPage() {
     { value: 'tips', label: { ar: 'نصائح عامة', en: 'General Tips' } },
   ];
 
-  const filteredArticles = articles.filter((article) => {
+  const allArticles = [...apiArticles, ...articles];
+
+  const filteredArticles = allArticles.filter((article) => {
     const matchesSearch =
       article.title[language].toLowerCase().includes(searchTerm.toLowerCase()) ||
       article.excerpt[language].toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesCategory =
       selectedCategory === 'all' ||
       article.category[language].toLowerCase().includes(categories.find(c => c.value === selectedCategory)?.label[language].toLowerCase() || '');
-    
+
     return matchesSearch && matchesCategory;
   });
 

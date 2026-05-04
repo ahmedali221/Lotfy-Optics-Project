@@ -6,7 +6,7 @@ const categories = [
   {
     title: 'نظارات شمسية',
     desc: 'تشكيلة واسعة من النظارات الشمسية العصرية التي توفر حماية كاملة وتناسب جميع الأذواق.',
-    link: '/sunglasses',
+    link: '/eyeglasses?tab=sunglasses',
     gradient: 'from-yellow-400 to-orange-500',
     image: 'https://images.unsplash.com/photo-1764778055595-b641b067ab40?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
     bgColor: 'bg-orange-50',

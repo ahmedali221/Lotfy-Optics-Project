@@ -1,7 +1,7 @@
 import { useLanguage } from '../../context/LanguageContext';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
-import { Sun, Calendar, ChevronDown } from 'lucide-react';
+import { Glasses, Calendar, ChevronDown } from 'lucide-react';
 import hero from "../../assets/hero.png"
 export function HeroSlider() {
   const { language } = useLanguage();
@@ -45,11 +45,11 @@ export function HeroSlider() {
 
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <Link
-                to="/sunglasses"
+                to="/eyeglasses"
                 className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
-                <Sun className="w-5 h-5" />
-                <span>{language === 'ar' ? 'تسوق النظارات الطبية' : 'Shop Glasses'}</span>
+                <Glasses className="w-5 h-5" />
+                <span>{language === 'ar' ? 'تسوق النظارات الان' : 'Shop Glasses Now'}</span>
               </Link>
               <Link
                 to="/clinics"
