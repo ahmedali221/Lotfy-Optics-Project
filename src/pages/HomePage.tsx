@@ -381,61 +381,94 @@ export function HomePage() {
               }
             </p>
           </div>
+        </div>
 
-          {/* Scrolling Brands */}
-          {brandNames.length > 0 && (
-          <div className="relative">
-            {/* Gradient Overlays */}
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10"></div>
+        {/* Scrolling Brands - full width infinite marquee */}
+        {brandNames.length > 0 && (
+          <div
+            className="relative w-full overflow-hidden"
+            style={{
+              // GPU-accelerated layer — keeps the animation butter-smooth
+              transform: 'translateZ(0)',
+            }}
+          >
+            {/* Left fade */}
+            <div
+              className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-32"
+              style={{ background: 'linear-gradient(to right, var(--background), transparent)' }}
+            />
+            {/* Right fade */}
+            <div
+              className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-32"
+              style={{ background: 'linear-gradient(to left, var(--background), transparent)' }}
+            />
 
-            {/* Scrolling Container */}
-            <div className="flex gap-16 animate-scroll">
-              {/* First Set */}
-              {brandNames.map((brand, index) => (
-                <div key={`first-${index}`} className="flex-shrink-0">
-                  <h4 className="text-2xl font-bold text-muted-foreground whitespace-nowrap">
-                    {brand}
-                  </h4>
-                </div>
+            {/*
+              The track holds TWO identical copies of the brand list side-by-side.
+              The animation slides the track left by exactly 50% of its own width,
+              which equals one full copy — then loops instantly back to 0.
+              Because copy-A slides out just as copy-B slides in (both identical),
+              the seam is invisible.
+
+              Key rules that make this seamless:
+                1. Each item uses padding-right (not gap) so the last item in
+                   each copy also carries trailing space → both copies are the
+                   same pixel-width → -50% lands on the exact seam.
+                2. width: max-content stops the flex row from wrapping.
+                3. will-change: transform hints the browser to promote the
+                   element to its own compositor layer.
+            */}
+            <div
+              className="marquee-track flex py-4"
+              style={{ width: 'max-content', willChange: 'transform' }}
+            >
+              {/* Copy A */}
+              {brandNames.map((brand, i) => (
+                <span
+                  key={`a-${i}`}
+                  className="whitespace-nowrap text-2xl font-bold text-muted-foreground"
+                  style={{ paddingRight: '4rem' }}   /* uniform spacing — including after last item */
+                >
+                  {brand}
+                </span>
               ))}
-              {/* Duplicate Set for Seamless Loop */}
-              {brandNames.map((brand, index) => (
-                <div key={`second-${index}`} className="flex-shrink-0">
-                  <h4 className="text-2xl font-bold text-muted-foreground whitespace-nowrap">
-                    {brand}
-                  </h4>
-                </div>
+              {/* Copy B — pixel-perfect clone so the loop is invisible */}
+              {brandNames.map((brand, i) => (
+                <span
+                  key={`b-${i}`}
+                  className="whitespace-nowrap text-2xl font-bold text-muted-foreground"
+                  style={{ paddingRight: '4rem' }}
+                >
+                  {brand}
+                </span>
               ))}
             </div>
           </div>
-          )}
+        )}
 
-          <div className="mt-12 text-center">
-            <p className="text-sm text-muted-foreground">
-              {language === 'ar'
-                ? 'وأكثر من 50 ماركة عالمية أخرى متوفرة في فروعنا'
-                : 'And more than 50 other international brands available in our branches'
-              }
-            </p>
-          </div>
+        <div className="mt-12 text-center">
+          <p className="text-sm text-muted-foreground">
+            {language === 'ar'
+              ? 'وأكثر من 50 ماركة عالمية أخرى متوفرة في فروعنا'
+              : 'And more than 50 other international brands available in our branches'
+            }
+          </p>
         </div>
 
         <style>{`
-          @keyframes scroll {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-50%);
-            }
+          /* Slide the track left by exactly one copy-width, then jump-reset.
+             The jump is invisible because copy-A and copy-B are identical. */
+          @keyframes marquee {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
           }
 
-          .animate-scroll {
-            animation: scroll 30s linear infinite;
+          .marquee-track {
+            animation: marquee 30s linear infinite;
           }
 
-          .animate-scroll:hover {
+          /* Pause on hover — gives users a chance to read a brand name */
+          .marquee-track:hover {
             animation-play-state: paused;
           }
         `}</style>

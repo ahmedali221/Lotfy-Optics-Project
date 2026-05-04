@@ -17,13 +17,21 @@ export function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.email || !formData.message) {
       toast.error(language === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill all required fields');
       return;
     }
 
-    toast.success(language === 'ar' ? 'تم إرسال رسالتك بنجاح' : 'Your message has been sent successfully');
+    const whatsappNumber = '201117744708';
+    const text = language === 'ar'
+      ? `الاسم: ${formData.name}${formData.subject ? `\nالموضوع: ${formData.subject}` : ''}`
+      : `Name: ${formData.name}${formData.subject ? `\nSubject: ${formData.subject}` : ''}`;
+
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+
+    toast.success(language === 'ar' ? 'جاري فتح واتساب لإرسال رسالتك' : 'Opening WhatsApp to send your message');
     setFormData({
       name: '',
       email: '',
@@ -241,7 +249,7 @@ export function ContactPage() {
 
                 <Button type="submit" className="w-full bg-primary hover:bg-primary-dark text-white">
                   <Send className="w-5 h-5 me-2" />
-                  {language === 'ar' ? 'إرسال الرسالة' : 'Send Message'}
+                  {language === 'ar' ? 'إرسال عبر واتساب' : 'Send via WhatsApp'}
                 </Button>
               </form>
             </div>
