@@ -491,11 +491,11 @@ export function LightFiltersPage() {
               {language === 'ar' ? 'احجز موعد' : 'Book Appointment'}
             </Link>
             <a
-              href="tel:01012115763"
+              href="tel:01037834311"
               className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/90 text-white px-8 py-3 rounded-lg transition-colors duration-200 font-semibold"
             >
               <Phone className="w-5 h-5" />
-              01012115763
+              01037834311
             </a>
           </div>
         </div>

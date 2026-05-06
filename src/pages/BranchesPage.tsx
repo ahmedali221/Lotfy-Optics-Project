@@ -12,7 +12,7 @@ export function BranchesPage() {
         ar: 'أسيوط - منطقة فريال - شارع الجلاء',
         en: 'Assiut - Ferial Area - Gelaa Street',
       },
-      phone: '01012115763',
+      phone: '01037834311',
       hours: {
         ar: 'السبت - الخميس: 10:00 ص - 10:00 م\nالجمعة: 2:00 م - 10:00 م',
         en: 'Sat - Thu: 10:00 AM - 10:00 PM\nFriday: 2:00 PM - 10:00 PM',
@@ -26,7 +26,7 @@ export function BranchesPage() {
         ar: 'أسيوط - تقسيم الحقوقيين - بجوار البنك الأهلي',
         en: 'Assiut - Hoqoqyin District - Next to National Bank',
       },
-      phone: '01012115763',
+      phone: '01037834311',
       hours: {
         ar: 'السبت - الخميس: 10:00 ص - 10:00 م\nالجمعة: مغلق',
         en: 'Sat - Thu: 10:00 AM - 10:00 PM\nFriday: Closed',
@@ -140,11 +140,11 @@ export function BranchesPage() {
             }
           </p>
           <a
-            href="tel:01012115763"
+            href="tel:01037834311"
             className="inline-flex items-center gap-2 bg-secondary hover:bg-secondary-light text-white px-8 py-3 rounded-lg transition-colors duration-200"
           >
             <Phone className="w-5 h-5" />
-            01012115763
+            01037834311
           </a>
         </div>
       </div>

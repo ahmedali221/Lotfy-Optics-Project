@@ -23,7 +23,7 @@ export function ContactPage() {
       return;
     }
 
-    const whatsappNumber = '201117744708';
+    const whatsappNumber = '201037834311';
     const text = language === 'ar'
       ? `الاسم: ${formData.name}${formData.subject ? `\nالموضوع: ${formData.subject}` : ''}`
       : `Name: ${formData.name}${formData.subject ? `\nSubject: ${formData.subject}` : ''}`;
@@ -87,8 +87,8 @@ export function ContactPage() {
                     <h4 className="mb-2">
                       {language === 'ar' ? 'اتصل بنا' : 'Call Us'}
                     </h4>
-                    <a href="tel:01012115763" className="text-muted-foreground hover:text-primary transition-colors">
-                      01012115763
+                    <a href="tel:01037834311" className="text-muted-foreground hover:text-primary transition-colors">
+                      01037834311
                     </a>
                   </div>
                 </div>
