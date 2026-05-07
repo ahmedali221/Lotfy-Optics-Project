@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { Facebook, Instagram, Phone, Mail, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Phone, Mail, MapPin, Music } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import logo from '../../assets/logo.png';
 
@@ -96,8 +96,8 @@ export function Footer() {
               <li className="flex  gap-3 w-full">
                 <MapPin className="w-4 h-4 text-[#d4af37] flex-shrink-0" />
                 <div className="text-sm text-gray-300 text-right leading-relaxed">
-                  <div>أسيوط - فريال</div>
-                  <div>أسيوط - الحقوقيين</div>
+                  <div className="mb-2">أسيوط - فريال شارع الحسن و الحسين متفرع من العدلي امام مخبز قراقيش</div>
+                  <div>أسيوط - تقسيم الحقوقيين بج الفيروز خلف مساكن عزبه السجن بجوار برج الحريه</div>
                 </div>
               </li>
             </ul>
@@ -107,7 +107,7 @@ export function Footer() {
               <h4 className="mb-4 font-bold text-sm text-white">تابعنا</h4>
               <div className="flex justify-center gap-4">
                 <a
-                  href="https://facebook.com"
+                  href="https://www.facebook.com/share/17YTkeTMtA/?mibextid=wwXIfr"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 rounded-full border border-[#d4af37] flex items-center justify-center text-[#d4af37] hover:bg-[#d4af37] hover:text-white transition-colors duration-200"
@@ -116,13 +116,32 @@ export function Footer() {
                   <Facebook className="w-4 h-4" />
                 </a>
                 <a
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/lotfykhalefa?utm_source=qr&igsh=MWozNWZreDJiYzg3dQ=="
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 rounded-full border border-[#d4af37] flex items-center justify-center text-[#d4af37] hover:bg-[#d4af37] hover:text-white transition-colors duration-200"
                   aria-label="Instagram"
                 >
                   <Instagram className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.tiktok.com/@lotfy.optics.assu?_r=1&_t=ZS-968YduGOx0L"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full border border-[#d4af37] flex items-center justify-center text-[#d4af37] hover:bg-[#d4af37] hover:text-white transition-colors duration-200"
+                  aria-label="TikTok"
+                >
+                  <svg 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className="w-4 h-4"
+                  >
+                    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+                  </svg>
                 </a>
               </div>
             </div>

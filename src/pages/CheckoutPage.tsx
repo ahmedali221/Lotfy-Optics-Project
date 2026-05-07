@@ -300,6 +300,21 @@ export function CheckoutPage() {
                                     </p>
                                   </div>
                                 )}
+                                {method.number && method.name.toLowerCase().includes('instapay') && (
+                                  <a
+                                    href={`instapay://pay?phoneNumber=${method.number}&amount=${depositAmount}`}
+                                    className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-white font-semibold text-sm transition-all duration-200 active:scale-95"
+                                    style={{ background: 'linear-gradient(135deg, #6B21A8 0%, #7C3AED 100%)' }}
+                                  >
+                                    <img
+                                      src="https://play-lh.googleusercontent.com/Q_xsEWD2hJnLTmBJ-LiMYwBrZJIjM1vpFzFWZXBQA5AxbHnNopJO0ow4Y-ZO5x2hYQ=w240-h480"
+                                      alt="InstaPay"
+                                      className="w-5 h-5 rounded"
+                                      onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                    />
+                                    {t(`افتح InstaPay وادفع ${depositAmount} جنيه`, `Open InstaPay & Pay ${depositAmount} EGP`)}
+                                  </a>
+                                )}
                               </div>
                             )}
                           </div>

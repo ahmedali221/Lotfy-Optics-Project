@@ -126,9 +126,14 @@ export function ContactPage() {
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
                       {language === 'ar'
-                        ? 'أسيوط شركه فريال، خلف النساجون الشرقيون للسجاد وبجوار مكتب بريد، قسم ثان أسيوط، محافظة أسيوط'
-                        : 'Assiut, Ferial Company, behind Al-Nassajoun Al-Sharqioun carpet store, next to post office, 2nd district, Assiut Governorate'}
+                        ? 'أسيوط - فريال شارع الحسن و الحسين متفرع من العدلي امام مخبز قراقيش'
+                        : 'Assiut - Ferial, El Hassan & El Hussein St., branching from El Adly, in front of Qaragish Bakery'}
                     </a>
+                    <div className="mt-2">
+                      <a href="tel:01118328666" className="text-primary font-medium hover:underline">
+                        01118328666
+                      </a>
+                    </div>
                   </div>
                 </div>
                 <div className="mt-4 rounded-lg overflow-hidden">
@@ -161,9 +166,14 @@ export function ContactPage() {
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
                       {language === 'ar'
-                        ? 'أسيوط، مدخل تقسيم الحقوقيين، برج الفيروز، خلف مساكن عزبة السجن، بجوار برج الحرية'
-                        : 'Assiut, entrance of Hoqoqyin division, Al-Fayroz Tower, behind Ozbet El-Segn residences, next to Al-Horeya Tower'}
+                        ? 'أسيوط - تقسيم الحقوقيين بج الفيروز خلف مساكن عزبه السجن بجوار برج الحريه'
+                        : 'Assiut - Hoqoqyin Division, Al Fayrouz Building, behind Ezbet El Segn residences, next to El Horreya Tower'}
                     </a>
+                    <div className="mt-2">
+                      <a href="tel:01037839913" className="text-primary font-medium hover:underline">
+                        01037839913
+                      </a>
+                    </div>
                   </div>
                 </div>
                 <div className="mt-4 rounded-lg overflow-hidden">

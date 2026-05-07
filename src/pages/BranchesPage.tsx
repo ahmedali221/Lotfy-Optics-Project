@@ -9,10 +9,10 @@ export function BranchesPage() {
       id: 'ferial',
       name: t('branches.ferial'),
       address: {
-        ar: 'أسيوط - منطقة فريال - شارع الجلاء',
-        en: 'Assiut - Ferial Area - Gelaa Street',
+        ar: 'أسيوط - فريال شارع الحسن و الحسين متفرع من العدلي امام مخبز قراقيش',
+        en: 'Assiut - Ferial, El Hassan & El Hussein St., branching from El Adly, in front of Qaragish Bakery',
       },
-      phone: '01037834311',
+      phone: '01118328666',
       hours: {
         ar: 'السبت - الخميس: 10:00 ص - 10:00 م\nالجمعة: 2:00 م - 10:00 م',
         en: 'Sat - Thu: 10:00 AM - 10:00 PM\nFriday: 2:00 PM - 10:00 PM',
@@ -23,10 +23,10 @@ export function BranchesPage() {
       id: 'hoqoqyin',
       name: t('branches.hoqoqyin'),
       address: {
-        ar: 'أسيوط - تقسيم الحقوقيين - بجوار البنك الأهلي',
-        en: 'Assiut - Hoqoqyin District - Next to National Bank',
+        ar: 'أسيوط - تقسيم الحقوقيين بج الفيروز خلف مساكن عزبه السجن بجوار برج الحريه',
+        en: 'Assiut - Hoqoqyin Division, Al Fayrouz Building, behind Ezbet El Segn residences, next to El Horreya Tower',
       },
-      phone: '01037834311',
+      phone: '01037839913',
       hours: {
         ar: 'السبت - الخميس: 10:00 ص - 10:00 م\nالجمعة: مغلق',
         en: 'Sat - Thu: 10:00 AM - 10:00 PM\nFriday: Closed',
