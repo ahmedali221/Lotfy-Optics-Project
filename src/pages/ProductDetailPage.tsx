@@ -6,7 +6,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { ApiProduct } from '../types/api';
 import { resolveImageUrl, ApiProductCard } from '../components/products/ApiProductCard';
 import {
-  Star, ShoppingCart, Heart, Share2, Truck, RotateCcw, Shield,
+  ShoppingCart, Heart, Share2, Truck, RotateCcw, Shield,
   CheckCircle, ChevronRight, Minus, Plus, Package,
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -107,44 +107,16 @@ export function ProductDetailPage() {
   const inCart = isInCart(product.id);
   const inWishlist = isInWishlist(product.id);
 
-  // Build image list from images array; fallback to placeholder
-  const productImages = product.images.length > 0
-    ? [...product.images].sort((a, b) => a.sort_order - b.sort_order).map(img => resolveImageUrl(img.image))
-    : [];
+  // Build sorted image list preserving colour metadata
+  const productImages = [...product.images].sort((a, b) => a.sort_order - b.sort_order);
+  const colourImages = productImages.filter((img, i) => i > 0 && img.colour);
+  const currentImageUrl = productImages[selectedImage] ? resolveImageUrl(productImages[selectedImage].image) : null;
+  const activeColour = productImages[selectedImage]?.colour ?? '';
 
   const categoryLabel = CATEGORY_LABELS[product.category]?.[language] ?? product.category;
   const genderLabel = GENDER_LABELS[product.gender]?.[language] ?? product.gender;
   const shapeLabel = product.frame_shape ? (FRAME_SHAPE_LABELS[product.frame_shape]?.[language] ?? product.frame_shape) : null;
   const lensTypeLabel = product.lens_type ? (LENS_TYPE_LABELS[product.lens_type]?.[language] ?? product.lens_type) : null;
-
-  // Mock reviews (no reviews API yet)
-  const reviews = [
-    {
-      id: 1,
-      name: t('أحمد محمد', 'Ahmed Mohamed'),
-      rating: 5,
-      date: '2024-02-10',
-      comment: t('منتج ممتاز، جودة عالية جداً وسعر مناسب. أنصح به بشدة!', 'Excellent product, very high quality and reasonable price. Highly recommend!'),
-      verified: true,
-    },
-    {
-      id: 2,
-      name: t('سارة علي', 'Sarah Ali'),
-      rating: 4,
-      date: '2024-02-08',
-      comment: t('جيدة جداً، لكن التوصيل استغرق وقتاً أطول من المتوقع', 'Very good, but delivery took longer than expected'),
-      verified: true,
-    },
-    {
-      id: 3,
-      name: t('محمود حسن', 'Mahmoud Hassan'),
-      rating: 5,
-      date: '2024-02-05',
-      comment: t('رائعة! تماماً كما في الصور، والإطار مريح جداً', 'Amazing! Exactly as pictured, and the frame is very comfortable'),
-      verified: false,
-    },
-  ];
-  const avgRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
 
   const handleAddToCart = () => {
     addItem(product, quantity);
@@ -190,9 +162,9 @@ export function ProductDetailPage() {
           <div className="space-y-4">
             {/* Main Image */}
             <div className="bg-white rounded-lg border border-border overflow-hidden aspect-square flex items-center justify-center p-8">
-              {productImages.length > 0 ? (
+              {currentImageUrl ? (
                 <img
-                  src={productImages[selectedImage]}
+                  src={currentImageUrl}
                   alt={product.name}
                   className="w-full h-full object-contain"
                 />
@@ -201,22 +173,6 @@ export function ProductDetailPage() {
               )}
             </div>
 
-            {/* Thumbnail Images */}
-            {productImages.length > 1 && (
-              <div className="grid grid-cols-4 gap-4">
-                {productImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`bg-white rounded-lg border-2 overflow-hidden aspect-square p-2 hover:border-primary transition-colors ${
-                      selectedImage === idx ? 'border-primary' : 'border-border'
-                    }`}
-                  >
-                    <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-contain" />
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Product Info */}
@@ -232,22 +188,6 @@ export function ProductDetailPage() {
 
             {/* Title */}
             <h1 className="">{product.name}</h1>
-
-            {/* Rating */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, idx) => (
-                  <Star
-                    key={idx}
-                    className={`w-5 h-5 ${idx < Math.floor(avgRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                  />
-                ))}
-                <span className="ms-2">{avgRating.toFixed(1)}</span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                ({reviews.length} {t('تقييم', 'reviews')})
-              </span>
-            </div>
 
             {/* Price */}
             <div className="border-t border-b border-border py-4">
@@ -286,10 +226,6 @@ export function ProductDetailPage() {
                   <span className="font-medium">{shapeLabel}</span>
                 </div>
               )}
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-muted-foreground">{t('اللون:', 'Colour:')}</span>
-                <span className="font-medium">{product.colour || t('غير محدد', 'Not specified')}</span>
-              </div>
               {lensTypeLabel && (
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-muted-foreground">
@@ -314,6 +250,46 @@ export function ProductDetailPage() {
                 </span>
               </div>
             </div>
+
+            {/* Colour selector — Amazon style */}
+            {colourImages.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">
+                  {t('اللون:', 'Colour:')}
+                  {activeColour && (
+                    <span className="ms-2 font-normal text-secondary">{activeColour}</span>
+                  )}
+                </p>
+                <div className="flex gap-3 flex-wrap">
+                  {colourImages.map((img) => {
+                    const idx = productImages.indexOf(img);
+                    const isActive = selectedImage === idx;
+                    return (
+                      <button
+                        key={img.id}
+                        onClick={() => setSelectedImage(idx)}
+                        className="flex flex-col items-center gap-1.5 group"
+                      >
+                        <div className={`w-16 h-16 rounded-lg border-2 overflow-hidden bg-white p-1 transition-all ${
+                          isActive ? 'border-primary' : 'border-border group-hover:border-primary/50'
+                        }`}>
+                          <img
+                            src={resolveImageUrl(img.image)}
+                            alt={img.colour}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <span className={`text-xs leading-tight text-center max-w-[64px] truncate transition-colors ${
+                          isActive ? 'text-primary font-medium' : 'text-muted-foreground group-hover:text-secondary'
+                        }`}>
+                          {img.colour}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Quantity Selector */}
             {!isOutOfStock && (
@@ -422,12 +398,6 @@ export function ProductDetailPage() {
               >
                 {t('المواصفات', 'Specifications')}
               </TabsTrigger>
-              <TabsTrigger
-                value="reviews"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
-              >
-                {t('التقييمات', 'Reviews')} ({reviews.length})
-              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="description" className="mt-6">
@@ -480,10 +450,25 @@ export function ProductDetailPage() {
                       <span className="font-medium">{shapeLabel}</span>
                     </div>
                   )}
-                  <div className="flex justify-between py-3 border-b border-border">
-                    <span className="text-muted-foreground">{t('اللون', 'Colour')}</span>
-                    <span className="font-medium">{product.colour || t('—', '—')}</span>
-                  </div>
+                  {colourImages.length > 0 && (
+                    <div className="flex justify-between items-start py-3 border-b border-border gap-4">
+                      <span className="text-muted-foreground shrink-0">{t('الألوان', 'Colours')}</span>
+                      <div className="flex flex-wrap gap-1.5 justify-end">
+                        {colourImages.map((img) => (
+                          <span
+                            key={img.id}
+                            className="flex items-center gap-1 text-xs bg-gray-100 px-2 py-0.5 rounded-full"
+                          >
+                            <span
+                              className="w-3 h-3 rounded-full border border-white shadow-sm shrink-0"
+                              style={{ background: img.colour }}
+                            />
+                            {img.colour}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {lensTypeLabel && (
                     <div className="flex justify-between py-3 border-b border-border">
                       <span className="text-muted-foreground">
@@ -508,79 +493,6 @@ export function ProductDetailPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="reviews" className="mt-6">
-              <div className="space-y-6">
-                {/* Rating Summary */}
-                <div className="bg-white rounded-lg border border-border p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="text-center md:text-start">
-                      <div className="text-5xl font-bold text-primary mb-2">{avgRating.toFixed(1)}</div>
-                      <div className="flex items-center justify-center md:justify-start gap-1 mb-2">
-                        {[...Array(5)].map((_, idx) => (
-                          <Star
-                            key={idx}
-                            className={`w-5 h-5 ${idx < Math.floor(avgRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {t('بناءً على', 'Based on')} {reviews.length} {t('تقييمات', 'reviews')}
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      {[5, 4, 3, 2, 1].map((star) => {
-                        const count = reviews.filter(r => r.rating === star).length;
-                        const percentage = (count / reviews.length) * 100;
-                        return (
-                          <div key={star} className="flex items-center gap-2">
-                            <span className="text-sm w-8">{star} ★</span>
-                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div className="h-full bg-yellow-400" style={{ width: `${percentage}%` }} />
-                            </div>
-                            <span className="text-sm text-muted-foreground w-8">{count}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Reviews List */}
-                <div className="space-y-4">
-                  {reviews.map((review) => (
-                    <div key={review.id} className="bg-white rounded-lg border border-border p-6">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium">{review.name}</span>
-                            {review.verified && (
-                              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                                {t('مشتري موثق', 'Verified Purchase')}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, idx) => (
-                              <Star
-                                key={idx}
-                                className={`w-4 h-4 ${idx < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <span className="text-sm text-muted-foreground">{review.date}</span>
-                      </div>
-                      <p className="text-muted-foreground">{review.comment}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Write Review */}
-                <Button variant="outline" className="w-full">
-                  {t('اكتب تقييمك', 'Write a Review')}
-                </Button>
-              </div>
-            </TabsContent>
           </Tabs>
         </div>
 

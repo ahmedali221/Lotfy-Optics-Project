@@ -11,13 +11,11 @@ export interface ApiProduct {
   gender: 'male' | 'female' | 'kids' | 'unisex';
   frame_shape: string | null;
   lens_type: 'medical' | 'sunglasses' | null;
-  frame_colour: string;
-  colour: string;         // empty string if not set
   price: string;          // decimal string from BE e.g. "1200.00"
   previous_price: string | null;
   stock_quantity: number;
   is_active: boolean;
-  images: { id: number; image: string; sort_order: number }[];
+  images: { id: number; image: string; sort_order: number; colour: string }[];
 }
 
 export interface ApiProductPage {
