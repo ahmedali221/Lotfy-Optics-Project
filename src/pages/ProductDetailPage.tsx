@@ -176,7 +176,10 @@ export function ProductDetailPage() {
           </div>
 
           {/* Product Info */}
-          <div className="space-y-6">
+          <div className="space-y-6 text-right" dir="rtl">
+            {/* Title */}
+            <h1 className="">{product.name}</h1>
+
             {/* Brand */}
             {product.brand && (
               <div className="text-sm text-primary">
@@ -185,9 +188,6 @@ export function ProductDetailPage() {
                 </Link>
               </div>
             )}
-
-            {/* Title */}
-            <h1 className="">{product.name}</h1>
 
             {/* Price */}
             <div className="border-t border-b border-border py-4">
@@ -228,10 +228,10 @@ export function ProductDetailPage() {
               )}
               {lensTypeLabel && (
                 <div className="flex items-center gap-2 text-sm">
+                  <span className="font-medium">{lensTypeLabel}</span>
                   <span className="text-muted-foreground">
                     {product.category === 'glasses' ? t('نوع النظارة:', 'Eyewear Type:') : t('نوع العدسة:', 'Lens Type:')}
                   </span>
-                  <span className="font-medium">{lensTypeLabel}</span>
                 </div>
               )}
               <div className="flex items-center gap-2 text-sm">
@@ -401,7 +401,7 @@ export function ProductDetailPage() {
             </TabsList>
 
             <TabsContent value="description" className="mt-6">
-              <div className="bg-white rounded-lg border border-border p-6">
+              <div className="bg-white rounded-lg border border-border p-6 text-right" dir="rtl">
                 <h3 className="mb-4">{t('وصف المنتج', 'Product Description')}</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   {t(
@@ -411,27 +411,27 @@ export function ProductDetailPage() {
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span>{t('حماية 100% من الأشعة فوق البنفسجية', '100% UV protection')}</span>
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span>{t('إطار خفيف ومريح للاستخدام اليومي', 'Lightweight and comfortable frame for daily use')}</span>
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span>{t('تصميم أنيق يناسب جميع المناسبات', 'Elegant design suitable for all occasions')}</span>
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span>{t('مصنوع من مواد عالية الجودة', 'Made from high quality materials')}</span>
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   </li>
                 </ul>
               </div>
             </TabsContent>
 
             <TabsContent value="specifications" className="mt-6">
-              <div className="bg-white rounded-lg border border-border p-6">
+              <div className="bg-white rounded-lg border border-border p-6 text-right" dir="rtl">
                 <h3 className="mb-4">{t('المواصفات التفصيلية', 'Detailed Specifications')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {product.brand && (
@@ -452,8 +452,9 @@ export function ProductDetailPage() {
                   )}
                   {colourImages.length > 0 && (
                     <div className="flex justify-between items-start py-3 border-b border-border gap-4">
-                      <span className="text-muted-foreground shrink-0">{t('الألوان', 'Colours')}</span>
-                      <div className="flex flex-wrap gap-1.5 justify-end">
+                                            <span className="text-muted-foreground shrink-0">{t('الألوان', 'Colours')}</span>
+
+                      <div className="flex flex-wrap gap-1.5 justify-start">
                         {colourImages.map((img) => (
                           <span
                             key={img.id}
