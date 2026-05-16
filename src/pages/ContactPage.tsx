@@ -126,7 +126,7 @@ export function ContactPage() {
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
                       {language === 'ar'
-                        ? 'أسيوط - فريال شارع الحسن و الحسين متفرع من العدلي امام مخبز قراقيش'
+                        ? 'أسيوط فريال شارع الحسن والحسين متفرع من العادلي أمام مخبز قراقيش وبجوار بريد الزهراء'
                         : 'Assiut - Ferial, El Hassan & El Hussein St., branching from El Adly, in front of Qaragish Bakery'}
                     </a>
                     <div className="mt-2">
@@ -166,7 +166,7 @@ export function ContactPage() {
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
                       {language === 'ar'
-                        ? 'أسيوط - تقسيم الحقوقيين بج الفيروز خلف مساكن عزبه السجن بجوار برج الحريه'
+                        ? 'أسيوط تقسيم الحقوقيين برج الفيروز خلف مساكن عزبه السجن بجوار برجّ الحريه'
                         : 'Assiut - Hoqoqyin Division, Al Fayrouz Building, behind Ezbet El Segn residences, next to El Horreya Tower'}
                     </a>
                     <div className="mt-2">

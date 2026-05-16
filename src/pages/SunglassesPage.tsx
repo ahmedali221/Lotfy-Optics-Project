@@ -74,12 +74,12 @@ export function SunglassesPage() {
     return () => clearTimeout(timer);
   }, [fetchSunProducts]);
 
-  const sunUniqueColours = [...new Set(products.map(p => p.colour).filter(Boolean))].sort();
+  const sunUniqueColours = [...new Set(products.flatMap(p => p.images.map(i => i.colour)).filter(Boolean))].sort();
 
   const sunFiltered = products.filter(p => {
     if (selectedBrands.length > 0 && !(p.brand && selectedBrands.includes(p.brand.id))) return false;
     if (selectedShapes.length > 0 && !(p.frame_shape && selectedShapes.includes(p.frame_shape))) return false;
-    if (selectedColours.length > 0 && !selectedColours.includes(p.colour)) return false;
+    if (selectedColours.length > 0 && !p.images.some(i => selectedColours.includes(i.colour))) return false;
     return true;
   });
 
@@ -300,11 +300,11 @@ export function LensesPage() {
     return () => clearTimeout(timer);
   }, [fetchProducts]);
 
-  const uniqueColours = [...new Set(products.map(p => p.colour).filter(Boolean))].sort();
+  const uniqueColours = [...new Set(products.flatMap(p => p.images.map(i => i.colour)).filter(Boolean))].sort();
 
   const filtered = products.filter(p => {
     if (selectedBrands.length > 0 && !(p.brand && selectedBrands.includes(p.brand.id))) return false;
-    if (selectedColours.length > 0 && !selectedColours.includes(p.colour)) return false;
+    if (selectedColours.length > 0 && !p.images.some(i => selectedColours.includes(i.colour))) return false;
     return true;
   });
 

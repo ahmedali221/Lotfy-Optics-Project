@@ -358,7 +358,7 @@ export function HomePage() {
             <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground">
                 {language === 'ar'
-                  ? '🏆 متوفر حصرياً في محلات لطفي للبصريات - احذر التقليد'
+                  ? '🏆 متوفر حصرياً في مراكز لطفي للبصريات - احذر التقليد'
                   : '🏆 Available exclusively at LOTFY OPTICAL - Beware of imitations'
                 }
               </p>
