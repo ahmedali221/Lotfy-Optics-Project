@@ -127,8 +127,8 @@ export function SunglassesPage() {
           </button>
         </div>
 
-        <div className="flex gap-8">
-          <aside className={`w-64 flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <aside className={`w-full lg:w-64 lg:flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             <div className="sticky top-28 space-y-5">
               <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                 <h3 className="font-bold mb-3 text-sm">{t('ترتيب حسب', 'Sort By')}</h3>

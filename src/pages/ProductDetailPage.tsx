@@ -173,6 +173,60 @@ export function ProductDetailPage() {
               )}
             </div>
 
+            {/* Mobile-only: scrollable thumbnails below main image */}
+            {(productImages.length > 1 || colourImages.length > 0) && (
+              <div className="flex items-center gap-1 lg:hidden">
+                {/* Scroll strip */}
+                <div className="flex gap-3 overflow-x-auto pb-2 flex-1" style={{ scrollbarWidth: 'none' }}>
+                  {/* Thumbnail (index 0) */}
+                  {productImages[0] && (
+                    <button
+                      onClick={() => setSelectedImage(0)}
+                      className="flex flex-col items-center gap-1.5 flex-shrink-0 group"
+                    >
+                      <div className={`w-16 h-16 rounded-lg border-2 overflow-hidden bg-white p-1 transition-all ${
+                        selectedImage === 0 ? 'border-primary' : 'border-border group-hover:border-primary/50'
+                      }`}>
+                        <img
+                          src={resolveImageUrl(productImages[0].image)}
+                          alt={product.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    </button>
+                  )}
+                  {/* Colour variant thumbnails */}
+                  {colourImages.map((img) => {
+                    const idx = productImages.indexOf(img);
+                    const isActive = selectedImage === idx;
+                    return (
+                      <button
+                        key={img.id}
+                        onClick={() => setSelectedImage(idx)}
+                        className="flex flex-col items-center gap-1.5 flex-shrink-0 group"
+                      >
+                        <div className={`w-16 h-16 rounded-lg border-2 overflow-hidden bg-white p-1 transition-all ${
+                          isActive ? 'border-primary' : 'border-border group-hover:border-primary/50'
+                        }`}>
+                          <img
+                            src={resolveImageUrl(img.image)}
+                            alt={img.colour}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <span className={`text-xs leading-tight text-center max-w-[64px] truncate transition-colors ${
+                          isActive ? 'text-primary font-medium' : 'text-muted-foreground group-hover:text-secondary'
+                        }`}>
+                          {img.colour}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -251,9 +305,9 @@ export function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Colour selector — Amazon style */}
+            {/* Colour selector — Amazon style (desktop only; mobile shows scrollable row under thumbnail) */}
             {colourImages.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-2 hidden lg:block">
                 <p className="text-sm font-medium">
                   {t('اللون:', 'Colour:')}
                   {activeColour && (
