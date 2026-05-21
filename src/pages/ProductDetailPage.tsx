@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
@@ -54,6 +54,23 @@ export function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const len = product?.images?.length ?? 0;
+    if (len < 2) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) setSelectedImage(i => (i + 1) % len);
+      else setSelectedImage(i => (i - 1 + len) % len);
+    }
+    touchStartX.current = null;
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -161,7 +178,12 @@ export function ProductDetailPage() {
           {/* Product Images */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="bg-white rounded-lg border border-border overflow-hidden aspect-square flex items-center justify-center p-8">
+            <div
+                className="bg-white rounded-lg border border-border overflow-hidden aspect-square flex items-center justify-center p-8"
+                style={{ touchAction: 'pan-y' }}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
               {currentImageUrl ? (
                 <img
                   src={currentImageUrl}
