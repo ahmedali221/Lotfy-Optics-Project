@@ -33,6 +33,7 @@ export function CheckoutPage() {
   const [depositAmount, setDepositAmount] = useState(100);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '', phone: '', phone2: '', email: '',
@@ -147,6 +148,7 @@ export function CheckoutPage() {
 
   const placeOrder = async () => {
     setIsProcessing(true);
+    setApiError(null);
     try {
       // 1. Sync cart items to BE
       for (const { product, quantity, imageId } of items) {
@@ -174,7 +176,13 @@ export function CheckoutPage() {
       clearCart();
       toast.success(t('تم تأكيد طلبك بنجاح!', 'Your order has been confirmed!'));
       navigate('/');
-    } catch {
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: unknown } };
+      const raw = axiosErr?.response?.data;
+      const message = raw
+        ? JSON.stringify(raw, null, 2)
+        : t('حدث خطأ. يرجى المحاولة مرة أخرى.', 'Something went wrong. Please try again.');
+      setApiError(message);
       toast.error(t('حدث خطأ. يرجى المحاولة مرة أخرى.', 'Something went wrong. Please try again.'));
     } finally {
       setIsProcessing(false);
@@ -501,6 +509,12 @@ export function CheckoutPage() {
                   <ArrowRight className={`w-5 h-5 ${language === 'ar' ? 'me-2 rotate-180' : 'ms-2'}`} />
                 </Button>
               ) : (
+                <div className="flex-1 space-y-3">
+                  {apiError && (
+                    <pre className="w-full rounded-lg border border-red-300 bg-red-50 p-3 text-xs text-red-700 overflow-x-auto whitespace-pre-wrap break-all">
+                      {apiError}
+                    </pre>
+                  )}
                 <button
                   onClick={handleSubmitOrder}
                   disabled={isProcessing}
@@ -523,6 +537,7 @@ export function CheckoutPage() {
                     </>
                   )}
                 </button>
+                </div>
               )}
             </div>
           </div>
