@@ -47,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(access);
     setUser(me);
     localStorage.setItem('customerToken', access);
+    localStorage.setItem('customerRefresh', data.refresh);
     localStorage.setItem('customerUser', JSON.stringify(me));
   };
 
@@ -61,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setUser(null);
     localStorage.removeItem('customerToken');
+    localStorage.removeItem('customerRefresh');
     localStorage.removeItem('customerUser');
   };
 

@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000',
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -15,5 +17,34 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// On 401: try to refresh, then retry. On refresh failure: clear auth and go home.
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      const refresh = localStorage.getItem('customerRefresh');
+      if (refresh) {
+        try {
+          const { data } = await axios.post(`${BASE_URL}/api/auth/refresh/`, { refresh });
+          localStorage.setItem('customerToken', data.access);
+          if (data.refresh) {
+            localStorage.setItem('customerRefresh', data.refresh);
+          }
+          original.headers.Authorization = `Bearer ${data.access}`;
+          return api(original);
+        } catch {
+          localStorage.removeItem('customerToken');
+          localStorage.removeItem('customerRefresh');
+          localStorage.removeItem('customerUser');
+          window.location.href = '/';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
