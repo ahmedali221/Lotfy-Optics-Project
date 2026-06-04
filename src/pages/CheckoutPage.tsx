@@ -90,9 +90,16 @@ export function CheckoutPage() {
     return !!proofFile && depositPaid;
   };
 
+  const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff'];
+
   const handleProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      toast.error(t('يرجى رفع صورة بصيغة JPEG أو PNG أو WEBP فقط', 'Please upload a JPEG, PNG, or WebP image'));
+      e.target.value = '';
+      return;
+    }
     setProofFile(file);
     setProofPreview(URL.createObjectURL(file));
   };
@@ -381,7 +388,7 @@ export function CheckoutPage() {
                       <span className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP</span>
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/gif,image/webp,image/bmp,image/tiff"
                         className="hidden"
                         onChange={handleProofChange}
                       />
