@@ -91,13 +91,19 @@ export function CheckoutPage() {
     return !!proofFile && depositPaid;
   };
 
-  const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff'];
+  const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  const MAX_PROOF_SIZE_MB = 5;
 
   const handleProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-      toast.error(t('يرجى رفع صورة بصيغة JPEG أو PNG أو WEBP فقط', 'Please upload a JPEG, PNG, or WebP image'));
+      toast.error(t('يرجى رفع صورة بصيغة JPEG أو PNG أو WEBP فقط', 'Please upload a JPEG, PNG, or WebP image only'));
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_PROOF_SIZE_MB * 1024 * 1024) {
+      toast.error(t(`حجم الصورة يجب أن لا يتجاوز ${MAX_PROOF_SIZE_MB} ميجابايت`, `Image must be smaller than ${MAX_PROOF_SIZE_MB} MB`));
       e.target.value = '';
       return;
     }
@@ -398,10 +404,10 @@ export function CheckoutPage() {
                       <span className="text-sm text-muted-foreground">
                         {t('اضغط لرفع الصورة', 'Click to upload image')}
                       </span>
-                      <span className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP</span>
+                      <span className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP — {t('الحد الأقصى', 'max')} 5MB</span>
                       <input
                         type="file"
-                        accept="image/jpeg,image/png,image/gif,image/webp,image/bmp,image/tiff"
+                        accept="image/jpeg,image/png,image/webp"
                         className="hidden"
                         onChange={handleProofChange}
                       />
