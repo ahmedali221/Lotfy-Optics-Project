@@ -21,7 +21,7 @@ interface PaymentMethodType {
 export function CheckoutPage() {
   const { language } = useLanguage();
   const { items, getTotal, clearCart } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
 
@@ -177,7 +177,12 @@ export function CheckoutPage() {
       toast.success(t('تم تأكيد طلبك بنجاح!', 'Your order has been confirmed!'));
       navigate('/');
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: unknown } };
+      const axiosErr = err as { response?: { status?: number; data?: unknown } };
+      if (axiosErr?.response?.status === 401) {
+        logout();
+        setShowAuthModal(true);
+        return;
+      }
       const raw = axiosErr?.response?.data;
       const message = raw
         ? JSON.stringify(raw, null, 2)

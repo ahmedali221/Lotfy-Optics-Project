@@ -39,7 +39,6 @@ api.interceptors.response.use(
           localStorage.removeItem('customerToken');
           localStorage.removeItem('customerRefresh');
           localStorage.removeItem('customerUser');
-          window.location.href = '/';
         }
       }
     }
