@@ -4,11 +4,12 @@ import { ApiProduct } from '../types/api';
 export interface CartItem {
   product: ApiProduct;
   quantity: number;
+  imageId: number | null;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: ApiProduct, quantity?: number) => void;
+  addItem: (product: ApiProduct, quantity?: number, imageId?: number | null) => void;
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
@@ -38,17 +39,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items]);
 
-  const addItem = (product: ApiProduct, quantity = 1) => {
+  const addItem = (product: ApiProduct, quantity = 1, imageId: number | null = null) => {
     setItems(prev => {
       const existing = prev.find(i => i.product.id === product.id);
       if (existing) {
         return prev.map(i =>
           i.product.id === product.id
-            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock_quantity) }
+            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock_quantity), imageId }
             : i
         );
       }
-      return [...prev, { product, quantity }];
+      return [...prev, { product, quantity, imageId }];
     });
   };
 

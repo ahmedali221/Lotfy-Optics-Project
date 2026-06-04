@@ -142,8 +142,12 @@ export function CheckoutPage() {
     setIsProcessing(true);
     try {
       // 1. Sync cart items to BE
-      for (const { product, quantity } of items) {
-        await api.post('/api/orders/cart-items/', { product: product.id, quantity });
+      for (const { product, quantity, imageId } of items) {
+        await api.post('/api/orders/cart-items/', {
+          product: product.id,
+          quantity,
+          ...(imageId ? { product_image: imageId } : {}),
+        });
       }
       // 2. Place order
       const { data: order } = await api.post('/api/orders/', { 
@@ -417,11 +421,15 @@ export function CheckoutPage() {
                 <div className="bg-white rounded-lg border border-border p-6">
                   <h3 className="mb-4">{t('المنتجات', 'Items')} ({items.length})</h3>
                   <div className="space-y-4">
-                    {items.map(({ product: item, quantity }) => (
+                    {items.map(({ product: item, quantity, imageId }) => {
+                      const imgSrc = imageId
+                        ? item.images.find(img => img.id === imageId)?.image
+                        : item.images[0]?.image;
+                      return (
                       <div key={item.id} className="flex gap-4 pb-4 border-b border-border last:border-0 last:pb-0">
                         <div className="w-14 h-14 rounded overflow-hidden bg-background flex-shrink-0">
-                          {item.image ? (
-                            <img src={resolveImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
+                          {imgSrc ? (
+                            <img src={resolveImageUrl(imgSrc)} alt={item.name} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-2xl">👓</div>
                           )}
@@ -432,7 +440,8 @@ export function CheckoutPage() {
                         </div>
                         <p className="font-medium text-sm text-primary">{(parseFloat(item.price) * quantity).toLocaleString()} {t('جنيه', 'EGP')}</p>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 

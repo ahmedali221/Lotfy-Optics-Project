@@ -136,12 +136,14 @@ export function ProductDetailPage() {
   const lensTypeLabel = product.lens_type ? (LENS_TYPE_LABELS[product.lens_type]?.[language] ?? product.lens_type) : null;
 
   const handleAddToCart = () => {
-    addItem(product, quantity);
+    const imageId = productImages[selectedImage]?.id ?? null;
+    addItem(product, quantity, imageId);
     toast.success(`${product.name} ${t('أضيف إلى السلة', 'added to cart')}`);
   };
 
   const handleBuyNow = () => {
-    addItem(product, quantity);
+    const imageId = productImages[selectedImage]?.id ?? null;
+    addItem(product, quantity, imageId);
     navigate('/cart');
   };
 
