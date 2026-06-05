@@ -174,9 +174,7 @@ export function CheckoutPage() {
       if (proofFile) {
         const formData = new FormData();
         formData.append('payment_proof', proofFile);
-        await api.post(`/api/orders/${order.id}/upload-payment-proof/`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        await api.post(`/api/orders/${order.id}/upload-payment-proof/`, formData);
       }
 
       clearCart();
