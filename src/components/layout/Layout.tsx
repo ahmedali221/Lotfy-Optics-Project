@@ -13,7 +13,7 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
-      <Toaster />
+      <Toaster offset={80} />
     </div>
   );
 }

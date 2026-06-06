@@ -92,7 +92,7 @@ export function CheckoutPage() {
   };
 
   const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-  const MAX_PROOF_SIZE_MB = 5;
+  const MAX_PROOF_SIZE_MB = 2;
 
   const handleProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -174,7 +174,9 @@ export function CheckoutPage() {
       if (proofFile) {
         const formData = new FormData();
         formData.append('payment_proof', proofFile);
-        await api.post(`/api/orders/${order.id}/upload-payment-proof/`, formData);
+        await api.post(`/api/orders/${order.id}/upload-payment-proof/`, formData, {
+          headers: { 'Content-Type': undefined },
+        });
       }
 
       clearCart();
