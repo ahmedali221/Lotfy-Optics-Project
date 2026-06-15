@@ -150,9 +150,15 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-[#34495e] pt-6 flex flex-col items-center justify-center">
+        <div className="border-t border-[#34495e] pt-6 flex flex-col items-center justify-center gap-2">
           <p className="text-gray-400 text-xs">
             © 2026 LOTFY OPTICAL. جميع الحقوق محفوظة.
+          </p>
+          <p className="text-gray-500 text-xs text-center">
+            تمت البرمجه بواسطه شركه Nexora للبرمجه و حلول السوفتوير &nbsp;|&nbsp; Developed by Nexora Programming &amp; Software Solutions
+          </p>
+          <p className="text-gray-500 text-xs" dir="ltr">
+            01117744708 &nbsp;|&nbsp; +20 10 02828648
           </p>
         </div>
       </div>
