@@ -49,6 +49,18 @@ export function EyeglassesPage() {
   const [brands, setBrands] = useState<ApiBrand[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Reset all filters when tab changes
+  useEffect(() => {
+    setActiveGender('all');
+    setSelectedBrands([]);
+    setSelectedShapes([]);
+    setSelectedColours([]);
+    setMinPrice('');
+    setMaxPrice('');
+    setSearch('');
+    setOrdering('');
+  }, [activeTab]);
+
   useEffect(() => {
     api.get('/api/catalog/brands/', { params: { page_size: 100 } })
       .then(({ data }) => setBrands(data.results ?? data))
@@ -68,6 +80,8 @@ export function EyeglassesPage() {
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
     if (ordering) params.ordering = ordering;
+    if (selectedBrands.length > 0) params.brand = selectedBrands.join(',');
+    if (selectedShapes.length > 0) params.frame_shape = selectedShapes.join(',');
 
     api.get<ApiProductPage>('/api/catalog/products/', { params })
       .then(({ data }) => setProducts(data.results ?? (data as unknown as ApiProduct[])))
@@ -164,9 +178,6 @@ export function EyeglassesPage() {
           {/* Sidebar */}
           <aside className={`w-full lg:w-64 lg:flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             <div className="sticky top-28 space-y-5">
-
-
-
               {/* Sort */}
               <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                 <h3 className="font-bold mb-3 text-sm">{t('ترتيب حسب', 'Sort By')}</h3>
@@ -204,7 +215,6 @@ export function EyeglassesPage() {
               {/* Price Range */}
               <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                 <h3 className="font-bold mb-4 text-sm">{t('السعر', 'Price')}</h3>
-                
                 <div className="px-2 mb-6">
                   <Slider
                     defaultValue={[0, 5000]}
@@ -222,27 +232,26 @@ export function EyeglassesPage() {
                     <span>{t(`${maxPrice || 5000} جنيه`, `${maxPrice || 5000} EGP`)}</span>
                   </div>
                 </div>
-
                 <div className="space-y-2">
-                  <button 
+                  <button
                     onClick={() => { setMinPrice(''); setMaxPrice('500'); }}
                     className={`w-full py-2.5 px-4 text-xs rounded-xl border transition-all ${minPrice === '' && maxPrice === '500' ? 'bg-primary/5 border-primary text-primary font-bold' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-600'}`}
                   >
                     {t('أقل من 500 جنيه', 'Less than 500 EGP')}
                   </button>
-                  <button 
+                  <button
                     onClick={() => { setMinPrice('500'); setMaxPrice('1000'); }}
                     className={`w-full py-2.5 px-4 text-xs rounded-xl border transition-all ${minPrice === '500' && maxPrice === '1000' ? 'bg-primary/5 border-primary text-primary font-bold' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-600'}`}
                   >
                     {t('500 - 1000 جنيه', '500 - 1000 EGP')}
                   </button>
-                  <button 
+                  <button
                     onClick={() => { setMinPrice('1000'); setMaxPrice('1500'); }}
                     className={`w-full py-2.5 px-4 text-xs rounded-xl border transition-all ${minPrice === '1000' && maxPrice === '1500' ? 'bg-primary/5 border-primary text-primary font-bold' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-600'}`}
                   >
                     {t('1000 - 1500 جنيه', '1000 - 1500 EGP')}
                   </button>
-                  <button 
+                  <button
                     onClick={() => { setMinPrice('1500'); setMaxPrice(''); }}
                     className={`w-full py-2.5 px-4 text-xs rounded-xl border transition-all ${minPrice === '1500' && maxPrice === '' ? 'bg-primary/5 border-primary text-primary font-bold' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-600'}`}
                   >
