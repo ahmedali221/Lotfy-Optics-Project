@@ -24,6 +24,8 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
   const { toggleItem, isInWishlist } = useWishlist();
 
   const price = parseFloat(product.price);
+  const prevPrice = product.previous_price ? parseFloat(product.previous_price) : Math.round(price * 1.2);
+  const discountPct = prevPrice > price ? Math.round(((prevPrice - price) / prevPrice) * 100) : null;
   const isOutOfStock = product.stock_quantity === 0;
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
   const inCart = isInCart(product.id);
@@ -103,8 +105,20 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
           <p className="text-xs text-muted-foreground mb-2">{product.brand.name}</p>
         )}
 
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-lg font-bold text-primary">{formatPrice(price)}</span>
+        <div className="flex items-center justify-between mt-3 gap-2">
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-lg font-bold text-primary">{formatPrice(price)}</span>
+              {discountPct && (
+                <span className="text-xs text-muted-foreground line-through">{formatPrice(prevPrice)}</span>
+              )}
+            </div>
+            {discountPct && (
+              <span className="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded w-fit mt-0.5">
+                {language === 'ar' ? `خصم ${discountPct}%` : `${discountPct}% OFF`}
+              </span>
+            )}
+          </div>
           <button
             onClick={handleAddToCart}
             disabled={inCart || isOutOfStock}

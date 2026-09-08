@@ -439,7 +439,7 @@ export function ProductDetailPage() {
                 <Truck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium">{t('توصيل مجاني', 'Free Delivery')}</p>
-                  <p className="text-sm text-muted-foreground">{t('للطلبات فوق 500 جنيه', 'For orders over 500 EGP')}</p>
+                  <p className="text-sm text-muted-foreground">{t('للطلبات فوق 1500 جنيه', 'For orders over 1500 EGP')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
