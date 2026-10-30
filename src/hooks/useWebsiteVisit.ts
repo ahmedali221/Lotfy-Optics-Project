@@ -19,9 +19,9 @@ export function useWebsiteVisit() {
     visitRequestInProgress = true;
 
     axios
-      .post<VisitResponse>(`${API_BASE_URL}/api/visits/`)
-      .then(({ data, status }) => {
-        if (status === 200 && data.active_visit === true) {
+      .post<VisitResponse>(`${API_BASE_URL}/api/site/visit/`)
+      .then(({ data }) => {
+        if (data.active_visit === true) {
           sessionStorage.setItem(ACTIVE_VISIT_KEY, 'true');
         }
       })

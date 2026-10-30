@@ -9,9 +9,11 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: ApiProduct, quantity?: number, imageId?: number | null) => void;
-  removeItem: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  // Returns how many units were actually added (stock is shared across image rows).
+  addItem: (product: ApiProduct, quantity?: number, imageId?: number | null) => number;
+  removeItem: (productId: number, imageId: number | null) => void;
+  updateQuantity: (productId: number, imageId: number | null, quantity: number) => void;
+  getMaxQuantity: (productId: number, imageId: number | null) => number;
   clearCart: () => void;
   getItemCount: () => number;
   getTotal: () => number;
@@ -39,33 +41,50 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items]);
 
+  // A cart row is identified by (product, selected image), matching the API.
+  const isRow = (i: CartItem, productId: number, imageId: number | null) =>
+    i.product.id === productId && (i.imageId ?? null) === (imageId ?? null);
+
+  // Stock is shared by every image row of the same product.
+  const maxQuantityFor = (rows: CartItem[], product: ApiProduct, imageId: number | null) => {
+    const usedByOtherRows = rows
+      .filter(i => i.product.id === product.id && !isRow(i, product.id, imageId))
+      .reduce((sum, i) => sum + i.quantity, 0);
+    return Math.max(0, product.stock_quantity - usedByOtherRows);
+  };
+
   const addItem = (product: ApiProduct, quantity = 1, imageId: number | null = null) => {
-    setItems(prev => {
-      const existing = prev.find(i => i.product.id === product.id);
-      if (existing) {
-        return prev.map(i =>
-          i.product.id === product.id
-            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock_quantity), imageId }
-            : i
-        );
-      }
-      return [...prev, { product, quantity, imageId }];
-    });
+    const existing = items.find(i => isRow(i, product.id, imageId));
+    const current = existing?.quantity ?? 0;
+    const next = Math.min(current + quantity, maxQuantityFor(items, product, imageId));
+    const added = Math.max(0, next - current);
+    if (added === 0) return 0;
+    setItems(prev =>
+      existing
+        ? prev.map(i => (isRow(i, product.id, imageId) ? { ...i, quantity: next } : i))
+        : [...prev, { product, quantity: next, imageId }]
+    );
+    return added;
   };
 
-  const removeItem = (productId: number) => {
-    setItems(prev => prev.filter(i => i.product.id !== productId));
+  const removeItem = (productId: number, imageId: number | null) => {
+    setItems(prev => prev.filter(i => !isRow(i, productId, imageId)));
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
-    if (quantity <= 0) { removeItem(productId); return; }
+  const updateQuantity = (productId: number, imageId: number | null, quantity: number) => {
+    if (quantity <= 0) { removeItem(productId, imageId); return; }
     setItems(prev =>
       prev.map(i =>
-        i.product.id === productId
-          ? { ...i, quantity: Math.min(quantity, i.product.stock_quantity) }
+        isRow(i, productId, imageId)
+          ? { ...i, quantity: Math.min(quantity, maxQuantityFor(prev, i.product, imageId)) }
           : i
       )
     );
+  };
+
+  const getMaxQuantity = (productId: number, imageId: number | null) => {
+    const row = items.find(i => i.product.id === productId);
+    return row ? maxQuantityFor(items, row.product, imageId) : 0;
   };
 
   const clearCart = () => setItems([]);
@@ -78,7 +97,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const isInCart = (productId: number) => items.some(i => i.product.id === productId);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, getItemCount, getTotal, isInCart }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, getMaxQuantity, clearCart, getItemCount, getTotal, isInCart }}>
       {children}
     </CartContext.Provider>
   );

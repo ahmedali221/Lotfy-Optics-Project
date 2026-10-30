@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Check, Phone, Search, Filter, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router';
-import api from '../lib/axios';
-import { ApiProduct, ApiProductPage, ApiBrand } from '../types/api';
+import { ApiProduct, ApiBrand } from '../types/api';
 import { ApiProductCard } from '../components/products/ApiProductCard';
+import { fetchAllPages } from '../lib/pagination';
 
 export function ArtificialEyesPage() {
   const { language } = useLanguage();
@@ -22,8 +22,8 @@ export function ArtificialEyesPage() {
   const [ordering, setOrdering] = useState('');
 
   useEffect(() => {
-    api.get('/api/catalog/brands/', { params: { page_size: 100 } })
-      .then(({ data }) => setBrands(data.results ?? data))
+    fetchAllPages<ApiBrand>('/api/catalog/brands/')
+      .then(setBrands)
       .catch(() => {});
   }, []);
 
@@ -35,9 +35,9 @@ export function ArtificialEyesPage() {
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
     if (ordering) params.ordering = ordering;
-    api.get<ApiProductPage>('/api/catalog/products/', { params })
-      .then(({ data }) => {
-        let results = data.results ?? (data as unknown as ApiProduct[]);
+    fetchAllPages<ApiProduct>('/api/catalog/products/', params)
+      .then(data => {
+        let results = data;
         if (selectedBrands.length > 0) results = results.filter(p => p.brand && selectedBrands.includes(p.brand.id));
         setProducts(results);
       })

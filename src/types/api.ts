@@ -18,8 +18,8 @@ export interface ApiProduct {
   images: { id: number; image: string; sort_order: number; colour: string }[];
 }
 
+// Cursor-paginated response: no total count; follow `next`/`previous` URLs.
 export interface ApiProductPage {
-  count: number;
   next: string | null;
   previous: string | null;
   results: ApiProduct[];
@@ -34,6 +34,5 @@ export interface ProductFilters {
   min_price?: number;
   max_price?: number;
   ordering?: string;
-  page?: number;
   page_size?: number;
 }

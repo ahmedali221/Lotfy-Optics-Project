@@ -3,8 +3,8 @@ import { useParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { ApiProductCard } from '../components/products/ApiProductCard';
 import { Search } from 'lucide-react';
-import api from '../lib/axios';
-import { ApiProduct, ApiProductPage, ApiBrand } from '../types/api';
+import { ApiProduct, ApiBrand } from '../types/api';
+import { fetchAllPages } from '../lib/pagination';
 
 const GENDER_MAP: Record<string, string> = {
   men: 'male',
@@ -44,8 +44,8 @@ export function EyeglassesSubPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/api/catalog/brands/', { params: { page_size: 100 } })
-      .then(({ data }) => setBrands(data.results ?? data))
+    fetchAllPages<ApiBrand>('/api/catalog/brands/')
+      .then(setBrands)
       .catch(() => {});
   }, []);
 
@@ -65,8 +65,8 @@ export function EyeglassesSubPage() {
     if (search) params.name = search;
     if (ordering) params.ordering = ordering;
 
-    api.get<ApiProductPage>('/api/catalog/products/', { params })
-      .then(({ data }) => setProducts(data.results ?? (data as unknown as ApiProduct[])))
+    fetchAllPages<ApiProduct>('/api/catalog/products/', params)
+      .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, [category, selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);

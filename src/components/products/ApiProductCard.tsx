@@ -37,7 +37,10 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, 1);
+    if (addItem(product, 1) === 0) {
+      toast.error(language === 'ar' ? 'لا يوجد مخزون كافٍ لإضافة المزيد' : 'Not enough stock to add more');
+      return;
+    }
     toast.success(`${product.name} ${language === 'ar' ? 'أضيف إلى السلة' : 'added to cart'}`);
   };
 

@@ -4,8 +4,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { ApiProductCard } from '../components/products/ApiProductCard';
 import { Filter, ChevronDown, Search } from 'lucide-react';
 import { Slider } from '../components/ui/slider';
-import api from '../lib/axios';
-import { ApiProduct, ApiProductPage, ApiBrand } from '../types/api';
+import { ApiProduct, ApiBrand } from '../types/api';
+import { fetchAllPages } from '../lib/pagination';
 
 const GENDER_MAP: Record<string, string> = {
   all: '',
@@ -62,8 +62,8 @@ export function EyeglassesPage() {
   }, [activeTab]);
 
   useEffect(() => {
-    api.get('/api/catalog/brands/', { params: { page_size: 100 } })
-      .then(({ data }) => setBrands(data.results ?? data))
+    fetchAllPages<ApiBrand>('/api/catalog/brands/')
+      .then(setBrands)
       .catch(() => {});
   }, []);
 
@@ -83,8 +83,8 @@ export function EyeglassesPage() {
     if (selectedBrands.length > 0) params.brand = selectedBrands.join(',');
     if (selectedShapes.length > 0) params.frame_shape = selectedShapes.join(',');
 
-    api.get<ApiProductPage>('/api/catalog/products/', { params })
-      .then(({ data }) => setProducts(data.results ?? (data as unknown as ApiProduct[])))
+    fetchAllPages<ApiProduct>('/api/catalog/products/', params)
+      .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, [activeTab, activeGender, selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);

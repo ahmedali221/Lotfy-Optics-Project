@@ -7,7 +7,7 @@ import { resolveImageUrl } from '../components/products/ApiProductCard';
 
 export function CartPage() {
   const { language } = useLanguage();
-  const { items, updateQuantity, removeItem, getTotal, clearCart } = useCart();
+  const { items, updateQuantity, removeItem, getMaxQuantity, getTotal, clearCart } = useCart();
   const navigate = useNavigate();
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
 
@@ -45,13 +45,18 @@ export function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Items */}
           <div className="lg:col-span-2 space-y-4">
-            {items.map(({ product: item, quantity }) => (
-              <div key={item.id} className="bg-white rounded-lg border border-border p-4">
+            {items.map(({ product: item, quantity, imageId }) => {
+              // Same product can appear in several rows, one per selected image.
+              const selectedImage = item.images?.find(img => img.id === imageId);
+              const rowImage = selectedImage?.image ?? item.image;
+              const maxQuantity = getMaxQuantity(item.id, imageId);
+              return (
+              <div key={`${item.id}-${imageId ?? 'none'}`} className="bg-white rounded-lg border border-border p-4">
                 <div className="flex gap-4">
                   <Link to={`/product/${item.id}`} className="flex-shrink-0">
                     <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden bg-background">
-                      {item.image ? (
-                        <img src={resolveImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
+                      {rowImage ? (
+                        <img src={resolveImageUrl(rowImage)} alt={item.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-4xl">👓</div>
                       )}
@@ -67,9 +72,12 @@ export function CartPage() {
                         {item.brand && (
                           <p className="text-xs text-muted-foreground mt-1">{item.brand.name}</p>
                         )}
+                        {selectedImage?.colour && (
+                          <p className="text-xs text-muted-foreground mt-1">{t('اللون', 'Colour')}: {selectedImage.colour}</p>
+                        )}
                       </div>
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.id, imageId)}
                         className="p-2 hover:bg-background rounded-lg text-destructive transition-colors"
                       >
                         <Trash2 className="w-5 h-5" />
@@ -78,11 +86,11 @@ export function CartPage() {
 
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex items-center border border-border rounded-lg">
-                        <button onClick={() => updateQuantity(item.id, quantity - 1)} disabled={quantity <= 1} className="p-2 hover:bg-background disabled:opacity-50">
+                        <button onClick={() => updateQuantity(item.id, imageId, quantity - 1)} disabled={quantity <= 1} className="p-2 hover:bg-background disabled:opacity-50">
                           <Minus className="w-4 h-4" />
                         </button>
                         <span className="px-4 py-2 min-w-[50px] text-center border-x border-border">{quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, quantity + 1)} disabled={quantity >= item.stock_quantity} className="p-2 hover:bg-background disabled:opacity-50">
+                        <button onClick={() => updateQuantity(item.id, imageId, quantity + 1)} disabled={quantity >= maxQuantity} className="p-2 hover:bg-background disabled:opacity-50">
                           <Plus className="w-4 h-4" />
                         </button>
                       </div>
@@ -107,7 +115,8 @@ export function CartPage() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
 
             <div className="pt-4">
               <Button

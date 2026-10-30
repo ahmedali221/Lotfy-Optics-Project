@@ -9,6 +9,7 @@ import { resolveImageUrl } from '../components/products/ApiProductCard';
 import { AuthModal } from '../components/auth/AuthModal';
 import { toast } from 'sonner@2.0.3';
 import api from '../lib/axios';
+import { getApiError } from '../lib/apiError';
 
 interface PaymentMethodType {
   id: number;
@@ -34,6 +35,9 @@ export function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  // Set when the order was created but the payment proof upload failed, so a retry
+  // only re-uploads the proof instead of placing a second order.
+  const [pendingOrderId, setPendingOrderId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '', phone: '', phone2: '', email: '',
@@ -152,49 +156,86 @@ export function CheckoutPage() {
     return lines.join('\n');
   };
 
+  // Adding the same (product, image) again increments the server row, so drop any
+  // rows left over from an earlier failed attempt before syncing the local cart.
+  const resetServerCart = async () => {
+    try {
+      // Always re-read the first page: deleting rows invalidates any cursor we hold.
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const { data } = await api.get('/api/orders/cart-items/', { params: { page_size: 100 } });
+        const rows: { id: number }[] = Array.isArray(data) ? data : data.results;
+        if (rows.length === 0) return;
+        await Promise.all(rows.map(row => api.delete(`/api/orders/cart-items/${row.id}/`)));
+      }
+    } catch {
+      // Best effort: the order request below still validates stock and contents.
+    }
+  };
+
+  const uploadProof = async (orderId: number) => {
+    if (!proofFile) return;
+    const formData = new FormData();
+    formData.append('payment_proof', proofFile);
+    await api.post(`/api/orders/${orderId}/upload-payment-proof/`, formData, {
+      headers: { 'Content-Type': undefined },
+    });
+  };
+
+  const finishOrder = () => {
+    setPendingOrderId(null);
+    clearCart();
+    toast.success(t('تم تأكيد طلبك بنجاح!', 'Your order has been confirmed!'));
+    navigate('/');
+  };
+
   const placeOrder = async () => {
     setIsProcessing(true);
     setApiError(null);
+    let orderId = pendingOrderId;
     try {
-      // 1. Sync cart items to BE
-      for (const { product, quantity, imageId } of items) {
-        await api.post('/api/orders/cart-items/', {
-          product: product.id,
-          quantity,
-          ...(imageId ? { product_image: imageId } : {}),
+      if (orderId === null) {
+        // 1. Sync cart items to BE (stock is validated across all image rows of a product)
+        await resetServerCart();
+        for (const { product, quantity, imageId } of items) {
+          await api.post('/api/orders/cart-items/', {
+            product: product.id,
+            quantity,
+            ...(imageId ? { product_image: imageId } : {}),
+          });
+        }
+        // 2. Place order
+        const { data: order } = await api.post('/api/orders/', {
+          notes: buildNotes(),
+          payment_method_id: selectedMethodId
         });
-      }
-      // 2. Place order
-      const { data: order } = await api.post('/api/orders/', { 
-        notes: buildNotes(),
-        payment_method_id: selectedMethodId 
-      });
-
-      // 3. Upload payment proof
-      if (proofFile) {
-        const formData = new FormData();
-        formData.append('payment_proof', proofFile);
-        await api.post(`/api/orders/${order.id}/upload-payment-proof/`, formData, {
-          headers: { 'Content-Type': undefined },
-        });
+        orderId = order.id as number;
       }
 
-      clearCart();
-      toast.success(t('تم تأكيد طلبك بنجاح!', 'Your order has been confirmed!'));
-      navigate('/');
+      // 3. Upload payment proof. A failure here must not hide that the order exists.
+      try {
+        await uploadProof(orderId);
+      } catch (err) {
+        setPendingOrderId(orderId);
+        const message = getApiError(err, language, { ar: 'تعذر رفع إيصال الدفع', en: 'Could not upload the payment receipt' });
+        setApiError(t(
+          `تم إنشاء طلبك رقم #${orderId} لكن لم يتم حفظ إيصال الدفع: ${message}. اضغط تأكيد الطلب لإعادة رفع الإيصال.`,
+          `Order #${orderId} was created, but the payment receipt was not saved: ${message}. Press confirm again to retry the upload.`,
+        ));
+        toast.error(t('لم يتم حفظ إيصال الدفع', 'Payment receipt was not saved'));
+        return;
+      }
+
+      finishOrder();
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { status?: number; data?: unknown } };
+      const axiosErr = err as { response?: { status?: number } };
       if (axiosErr?.response?.status === 401) {
         logout();
         setShowAuthModal(true);
         return;
       }
-      const raw = axiosErr?.response?.data;
-      const message = raw
-        ? JSON.stringify(raw, null, 2)
-        : t('حدث خطأ. يرجى المحاولة مرة أخرى.', 'Something went wrong. Please try again.');
+      const message = getApiError(err, language, { ar: 'حدث خطأ. يرجى المحاولة مرة أخرى.', en: 'Something went wrong. Please try again.' });
       setApiError(message);
-      toast.error(t('حدث خطأ. يرجى المحاولة مرة أخرى.', 'Something went wrong. Please try again.'));
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }
@@ -404,7 +445,7 @@ export function CheckoutPage() {
                       <span className="text-sm text-muted-foreground">
                         {t('اضغط لرفع الصورة', 'Click to upload image')}
                       </span>
-                      <span className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP — {t('الحد الأقصى', 'max')} 5MB</span>
+                      <span className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP — {t('الحد الأقصى', 'max')} {MAX_PROOF_SIZE_MB}MB</span>
                       <input
                         type="file"
                         accept="image/jpeg,image/png,image/webp"
@@ -522,9 +563,9 @@ export function CheckoutPage() {
               ) : (
                 <div className="flex-1 space-y-3">
                   {apiError && (
-                    <pre className="w-full rounded-lg border border-red-300 bg-red-50 p-3 text-xs text-red-700 overflow-x-auto whitespace-pre-wrap break-all">
+                    <p className="w-full rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 whitespace-pre-wrap">
                       {apiError}
-                    </pre>
+                    </p>
                   )}
                 <button
                   onClick={handleSubmitOrder}

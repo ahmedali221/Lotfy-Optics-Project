@@ -8,6 +8,7 @@ import { ApiProduct } from '../types/api';
 import { Calendar, Shield, Award, Truck, ArrowRight, Clock, BadgeCheck, Star } from 'lucide-react';
 import api from '../lib/axios';
 import pixxLogo from  '../assets/pix.png';
+import { fetchAllPages } from '../lib/pagination';
 export function HomePage() {
   const { t, language } = useLanguage();
   const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
@@ -23,9 +24,9 @@ export function HomePage() {
   }, []);
 
   useEffect(() => {
-    api.get('/api/catalog/brands/', { params: { page_size: 100 } })
-      .then(({ data }) => {
-        const names: string[] = (data.results ?? data).map((b: { name: string }) => b.name).filter(Boolean);
+    fetchAllPages<{ name: string }>('/api/catalog/brands/')
+      .then(data => {
+        const names: string[] = data.map((b: { name: string }) => b.name).filter(Boolean);
         if (names.length > 0) setBrandNames(names);
       })
       .catch(() => {});

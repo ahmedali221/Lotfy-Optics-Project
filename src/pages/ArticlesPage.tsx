@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import api from '../lib/axios';
+import { fetchAllPages } from '../lib/pagination';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://165.227.137.145:8080';
 
@@ -335,18 +335,17 @@ export function ArticlesPage() {
   const [apiArticles, setApiArticles] = useState<Article[]>([]);
 
   useEffect(() => {
-    api.get('/api/articles/', { params: { page_size: 100 } })
-      .then(({ data }) => {
-        const results = data.results ?? data;
-        const mapped: Article[] = results.map((a: {
-          id: number;
-          title: string;
-          subtitle: string;
-          image: string | null;
-          author: string;
-          minutes_to_read: number;
-          published_date: string;
-        }) => ({
+    fetchAllPages<{
+      id: number;
+      title: string;
+      subtitle: string;
+      image: string | null;
+      author: string;
+      minutes_to_read: number;
+      published_date: string;
+    }>('/api/articles/')
+      .then(results => {
+        const mapped: Article[] = results.map(a => ({
           id: `api-${a.id}`,
           slug: `api-${a.id}`,
           title: { ar: a.title, en: a.title },

@@ -135,15 +135,26 @@ export function ProductDetailPage() {
   const shapeLabel = product.frame_shape ? (FRAME_SHAPE_LABELS[product.frame_shape]?.[language] ?? product.frame_shape) : null;
   const lensTypeLabel = product.lens_type ? (LENS_TYPE_LABELS[product.lens_type]?.[language] ?? product.lens_type) : null;
 
-  const handleAddToCart = () => {
+  // Stock is shared across all image rows of this product, so the cart may accept fewer units than requested.
+  const addSelectionToCart = () => {
     const imageId = productImages[selectedImage]?.id ?? null;
-    addItem(product, quantity, imageId);
-    toast.success(`${product.name} ${t('أضيف إلى السلة', 'added to cart')}`);
+    const added = addItem(product, quantity, imageId);
+    if (added === 0) {
+      toast.error(t('لا يوجد مخزون كافٍ لإضافة المزيد من هذا المنتج', 'Not enough stock to add more of this product'));
+    } else if (added < quantity) {
+      toast.warning(t(`تمت إضافة ${added} فقط حسب المخزون المتاح`, `Only ${added} added due to available stock`));
+    }
+    return added;
+  };
+
+  const handleAddToCart = () => {
+    if (addSelectionToCart() === quantity) {
+      toast.success(`${product.name} ${t('أضيف إلى السلة', 'added to cart')}`);
+    }
   };
 
   const handleBuyNow = () => {
-    const imageId = productImages[selectedImage]?.id ?? null;
-    addItem(product, quantity, imageId);
+    addSelectionToCart();
     navigate('/cart');
   };
 
