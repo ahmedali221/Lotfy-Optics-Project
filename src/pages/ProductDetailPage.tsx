@@ -121,7 +121,6 @@ export function ProductDetailPage() {
   const discountPct = prevPrice > price ? Math.round(((prevPrice - price) / prevPrice) * 100) : null;
   const isOutOfStock = product.stock_quantity === 0;
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
-  const inCart = isInCart(product.id);
   const inWishlist = isInWishlist(product.id);
 
   // Build sorted image list preserving colour metadata
@@ -129,6 +128,7 @@ export function ProductDetailPage() {
   const colourImages = productImages.filter((img, i) => i > 0 && img.colour);
   const currentImageUrl = productImages[selectedImage] ? resolveImageUrl(productImages[selectedImage].image) : null;
   const activeColour = productImages[selectedImage]?.colour ?? '';
+  const inCart = isInCart(product.id, productImages[selectedImage]?.id ?? null);
 
   const categoryLabel = CATEGORY_LABELS[product.category]?.[language] ?? product.category;
   const genderLabel = GENDER_LABELS[product.gender]?.[language] ?? product.gender;

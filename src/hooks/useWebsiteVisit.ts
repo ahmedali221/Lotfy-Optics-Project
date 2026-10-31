@@ -18,8 +18,9 @@ export function useWebsiteVisit() {
 
     visitRequestInProgress = true;
 
+    // Legacy plural route: supported by both current and Phase 1 backends.
     axios
-      .post<VisitResponse>(`${API_BASE_URL}/api/site/visit/`)
+      .post<VisitResponse>(`${API_BASE_URL}/api/site/visits/`)
       .then(({ data }) => {
         if (data.active_visit === true) {
           sessionStorage.setItem(ACTIVE_VISIT_KEY, 'true');

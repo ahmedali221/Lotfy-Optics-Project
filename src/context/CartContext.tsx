@@ -17,7 +17,8 @@ interface CartContextType {
   clearCart: () => void;
   getItemCount: () => number;
   getTotal: () => number;
-  isInCart: (productId: number) => boolean;
+  // Without imageId: any row of the product. With imageId (or null): that exact row.
+  isInCart: (productId: number, imageId?: number | null) => boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -94,7 +95,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const getTotal = () =>
     items.reduce((sum, i) => sum + parseFloat(i.product.price) * i.quantity, 0);
 
-  const isInCart = (productId: number) => items.some(i => i.product.id === productId);
+  const isInCart = (productId: number, imageId?: number | null) =>
+    items.some(i => (imageId === undefined ? i.product.id === productId : isRow(i, productId, imageId)));
 
   return (
     <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, getMaxQuantity, clearCart, getItemCount, getTotal, isInCart }}>

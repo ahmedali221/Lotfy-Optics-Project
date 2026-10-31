@@ -12,7 +12,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       duration={4000}
       toastOptions={{
         style: {
-          fontFamily: "'Tajawal', sans-serif",
+          fontFamily: "'Cairo', sans-serif",
           fontSize: "0.9rem",
           fontWeight: 500,
           borderRadius: "0.625rem",
