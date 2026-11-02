@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+/* Cairo is loaded from index.html: an @import here is dropped by the production build. */
 @import "tailwindcss";
 
 @theme {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { ApiProductCard } from '../components/products/ApiProductCard';
@@ -6,6 +6,8 @@ import { Filter, ChevronDown, Search } from 'lucide-react';
 import { Slider } from '../components/ui/slider';
 import { ApiProduct, ApiBrand } from '../types/api';
 import { fetchAllPages } from '../lib/pagination';
+import { useRestoreScroll } from '../components/layout/ScrollToTop';
+import { readList, readNumberList, useSyncSearchParams } from '../hooks/useUrlFilters';
 
 const GENDER_MAP: Record<string, string> = {
   all: '',
@@ -35,22 +37,39 @@ export function EyeglassesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') === 'sunglasses' ? 'sunglasses' : 'medical';
 
-  const [activeGender, setActiveGender] = useState('all');
-  const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
-  const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
-  const [selectedColours, setSelectedColours] = useState<string[]>([]);
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [search, setSearch] = useState('');
-  const [ordering, setOrdering] = useState('');
+  // Filters start from the URL so Back from a product page restores them.
+  const [activeGender, setActiveGender] = useState(() => searchParams.get('gender') ?? 'all');
+  const [selectedBrands, setSelectedBrands] = useState<number[]>(() => readNumberList(searchParams, 'brands'));
+  const [selectedShapes, setSelectedShapes] = useState<string[]>(() => readList(searchParams, 'shapes'));
+  const [selectedColours, setSelectedColours] = useState<string[]>(() => readList(searchParams, 'colours'));
+  const [minPrice, setMinPrice] = useState(() => searchParams.get('min') ?? '');
+  const [maxPrice, setMaxPrice] = useState(() => searchParams.get('max') ?? '');
+  const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
+  const [ordering, setOrdering] = useState(() => searchParams.get('sort') ?? '');
   const [showFilters, setShowFilters] = useState(false);
 
   const [products, setProducts] = useState<ApiProduct[]>([]);
   const [brands, setBrands] = useState<ApiBrand[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Reset all filters when tab changes
+  useRestoreScroll(!loading);
+
+  useSyncSearchParams({
+    gender: activeGender === 'all' ? '' : activeGender,
+    brands: selectedBrands.join(','),
+    shapes: selectedShapes.join(','),
+    colours: selectedColours.join(','),
+    min: minPrice,
+    max: maxPrice,
+    q: search,
+    sort: ordering,
+  });
+
+  // Reset all filters when tab changes (not on mount, which restores them from the URL)
+  const prevTab = useRef(activeTab);
   useEffect(() => {
+    if (prevTab.current === activeTab) return;
+    prevTab.current = activeTab;
     setActiveGender('all');
     setSelectedBrands([]);
     setSelectedShapes([]);

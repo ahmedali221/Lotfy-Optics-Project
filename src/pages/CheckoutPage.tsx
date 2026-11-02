@@ -10,6 +10,7 @@ import { AuthModal } from '../components/auth/AuthModal';
 import { toast } from 'sonner@2.0.3';
 import api from '../lib/axios';
 import { getApiError } from '../lib/apiError';
+import { fetchAllPages } from '../lib/pagination';
 
 interface PaymentMethodType {
   id: number;
@@ -59,17 +60,17 @@ export function CheckoutPage() {
   useEffect(() => {
     if (items.length === 0) navigate('/cart');
     
-    api.get('/api/orders/payment-methods/').then(res => {
-      const methods = (res.data.results || res.data).filter((m: PaymentMethodType) => m.is_active);
+    // Both lists are paginated (20 per page by default); load every page.
+    fetchAllPages<PaymentMethodType>('/api/orders/payment-methods/').then(all => {
+      const methods = all.filter(m => m.is_active);
       setApiPaymentMethods(methods);
       if (methods.length > 0) setSelectedMethodId(methods[0].id);
     }).catch(() => {});
 
-    api.get('/api/orders/delivery-fees/').then(res => {
-      const fees = res.data.results || res.data;
+    fetchAllPages<{ governorate: string; fee: string }>('/api/orders/delivery-fees/').then(fees => {
       const feeMap: Record<string, number> = {};
       const govs: string[] = [];
-      fees.forEach((f: any) => {
+      fees.forEach(f => {
         feeMap[f.governorate] = parseFloat(f.fee);
         govs.push(f.governorate);
       });
@@ -176,6 +177,10 @@ export function CheckoutPage() {
     if (!proofFile) return;
     const formData = new FormData();
     formData.append('payment_proof', proofFile);
+    // The deposit is only recorded when sent with the receipt; staff confirm it on approval
+    // (the order then becomes `deposited`). The API rejects deposits above the order total.
+    const deposit = Math.min(depositAmount, subtotal);
+    if (deposit > 0) formData.append('deposit_amount', deposit.toFixed(2));
     await api.post(`/api/orders/${orderId}/upload-payment-proof/`, formData, {
       headers: { 'Content-Type': undefined },
     });

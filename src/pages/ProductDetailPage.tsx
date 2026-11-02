@@ -117,8 +117,8 @@ export function ProductDetailPage() {
   if (!product) return null;
 
   const price = parseFloat(product.price);
-  const prevPrice = product.previous_price ? parseFloat(product.previous_price) : Math.round(price * 1.2);
-  const discountPct = prevPrice > price ? Math.round(((prevPrice - price) / prevPrice) * 100) : null;
+  const prevPrice = product.previous_price ? parseFloat(product.previous_price) : null;
+  const discountPct = prevPrice !== null && prevPrice > price ? Math.round(((prevPrice - price) / prevPrice) * 100) : null;
   const isOutOfStock = product.stock_quantity === 0;
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
   const inWishlist = isInWishlist(product.id);
@@ -287,7 +287,7 @@ export function ProductDetailPage() {
                 {discountPct && (
                   <>
                     <span className="text-sm text-muted-foreground line-through">
-                      {prevPrice.toLocaleString()} {t('جنيه', 'EGP')}
+                      {prevPrice!.toLocaleString()} {t('جنيه', 'EGP')}
                     </span>
                     <span className="text-sm bg-red-100 text-red-600 px-2 py-1 rounded">
                       {t(`خصم ${discountPct}%`, `${discountPct}% OFF`)}

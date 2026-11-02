@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { ApiProductCard } from '../components/products/ApiProductCard';
 import { Search } from 'lucide-react';
 import { ApiProduct, ApiBrand } from '../types/api';
 import { fetchAllPages } from '../lib/pagination';
+import { useRestoreScroll } from '../components/layout/ScrollToTop';
+import { readList, readNumberList, useSyncSearchParams } from '../hooks/useUrlFilters';
 
 const GENDER_MAP: Record<string, string> = {
   men: 'male',
@@ -31,17 +33,32 @@ export function EyeglassesSubPage() {
   const { language } = useLanguage();
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
 
-  const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
-  const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
-  const [selectedColours, setSelectedColours] = useState<string[]>([]);
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [search, setSearch] = useState('');
-  const [ordering, setOrdering] = useState('');
+  const [searchParams] = useSearchParams();
+
+  // Filters start from the URL so Back from a product page restores them.
+  const [selectedBrands, setSelectedBrands] = useState<number[]>(() => readNumberList(searchParams, 'brands'));
+  const [selectedShapes, setSelectedShapes] = useState<string[]>(() => readList(searchParams, 'shapes'));
+  const [selectedColours, setSelectedColours] = useState<string[]>(() => readList(searchParams, 'colours'));
+  const [minPrice, setMinPrice] = useState(() => searchParams.get('min') ?? '');
+  const [maxPrice, setMaxPrice] = useState(() => searchParams.get('max') ?? '');
+  const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
+  const [ordering, setOrdering] = useState(() => searchParams.get('sort') ?? '');
 
   const [products, setProducts] = useState<ApiProduct[]>([]);
   const [brands, setBrands] = useState<ApiBrand[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useRestoreScroll(!loading);
+
+  useSyncSearchParams({
+    brands: selectedBrands.join(','),
+    shapes: selectedShapes.join(','),
+    colours: selectedColours.join(','),
+    min: minPrice,
+    max: maxPrice,
+    q: search,
+    sort: ordering,
+  });
 
   useEffect(() => {
     fetchAllPages<ApiBrand>('/api/catalog/brands/')

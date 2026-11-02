@@ -24,8 +24,8 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
   const { toggleItem, isInWishlist } = useWishlist();
 
   const price = parseFloat(product.price);
-  const prevPrice = product.previous_price ? parseFloat(product.previous_price) : Math.round(price * 1.2);
-  const discountPct = prevPrice > price ? Math.round(((prevPrice - price) / prevPrice) * 100) : null;
+  const prevPrice = product.previous_price ? parseFloat(product.previous_price) : null;
+  const discountPct = prevPrice !== null && prevPrice > price ? Math.round(((prevPrice - price) / prevPrice) * 100) : null;
   const isOutOfStock = product.stock_quantity === 0;
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
   const inCart = isInCart(product.id);
@@ -113,7 +113,7 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-lg font-bold text-primary">{formatPrice(price)}</span>
               {discountPct && (
-                <span className="text-xs text-muted-foreground line-through">{formatPrice(prevPrice)}</span>
+                <span className="text-xs text-muted-foreground line-through">{formatPrice(prevPrice!)}</span>
               )}
             </div>
             {discountPct && (
