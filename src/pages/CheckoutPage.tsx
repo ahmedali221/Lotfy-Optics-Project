@@ -211,7 +211,9 @@ export function CheckoutPage() {
         // 2. Place order
         const { data: order } = await api.post('/api/orders/', {
           notes: buildNotes(),
-          payment_method_id: selectedMethodId
+          payment_method_id: selectedMethodId,
+          // The API looks up and stores the delivery fee for this governorate.
+          governorate: formData.governorate,
         });
         orderId = order.id as number;
       }

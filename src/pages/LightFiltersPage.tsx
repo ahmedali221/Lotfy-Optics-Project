@@ -44,7 +44,7 @@ export function LightFiltersPage() {
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
-    if (ordering) params.ordering = ordering;
+    params.ordering = ordering || '-id'; // newest first by default
     fetchAllPages<ApiProduct>('/api/catalog/products/', params)
       .then(data => {
         let results = data;
@@ -292,7 +292,7 @@ export function LightFiltersPage() {
                     onChange={e => setOrdering(e.target.value)}
                     className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                   >
-                    <option value="">{tl('الافتراضي', 'Default')}</option>
+                    <option value="">{tl('الأحدث', 'Newest')}</option>
                     <option value="price">{tl('السعر: الأقل أولاً', 'Price: Low to High')}</option>
                     <option value="-price">{tl('السعر: الأعلى أولاً', 'Price: High to Low')}</option>
                     <option value="name">{tl('الاسم: أ-ي', 'Name: A-Z')}</option>

@@ -19,10 +19,11 @@ const GENDERS_SUN = [
   { id: 'men',   ar: 'رجالي',   en: 'Men'   },
   { id: 'women', ar: 'نسائي',   en: 'Women' },
   { id: 'kids',  ar: 'أطفال',   en: 'Kids'  },
+  { id: 'unisex', ar: 'للجنسين', en: 'Unisex' },
 ];
 
 const GENDER_MAP_SUN: Record<string, string> = {
-  all: '', men: 'male', women: 'female', kids: 'kids',
+  all: '', men: 'male', women: 'female', kids: 'kids', unisex: 'unisex',
 };
 
 export function SunglassesPage() {
@@ -61,7 +62,7 @@ export function SunglassesPage() {
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
-    if (ordering) params.ordering = ordering;
+    params.ordering = ordering || '-id'; // newest first by default
 
     fetchAllPages<ApiProduct>('/api/catalog/products/', params)
       .then(setProducts)
@@ -133,7 +134,7 @@ export function SunglassesPage() {
               <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                 <h3 className="font-bold mb-3 text-sm">{t('ترتيب حسب', 'Sort By')}</h3>
                 <select value={ordering} onChange={e => setOrdering(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                  <option value="">{t('الافتراضي', 'Default')}</option>
+                  <option value="">{t('الأحدث', 'Newest')}</option>
                   <option value="price">{t('السعر: الأقل أولاً', 'Price: Low to High')}</option>
                   <option value="-price">{t('السعر: الأعلى أولاً', 'Price: High to Low')}</option>
                   <option value="name">{t('الاسم أ-ي', 'Name A-Z')}</option>
@@ -287,7 +288,7 @@ export function LensesPage() {
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
-    if (ordering) params.ordering = ordering;
+    params.ordering = ordering || '-id'; // newest first by default
 
     fetchAllPages<ApiProduct>('/api/catalog/products/', params)
       .then(setProducts)
@@ -362,7 +363,7 @@ export function LensesPage() {
               <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                 <h3 className="font-bold mb-3 text-sm">{t('ترتيب حسب', 'Sort By')}</h3>
                 <select value={ordering} onChange={e => setOrdering(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                  <option value="">{t('الافتراضي', 'Default')}</option>
+                  <option value="">{t('الأحدث', 'Newest')}</option>
                   <option value="price">{t('السعر: الأقل أولاً', 'Price: Low to High')}</option>
                   <option value="-price">{t('السعر: الأعلى أولاً', 'Price: High to Low')}</option>
                   <option value="name">{t('الاسم أ-ي', 'Name A-Z')}</option>

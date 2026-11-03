@@ -14,6 +14,7 @@ const GENDER_MAP: Record<string, string> = {
   men: 'male',
   women: 'female',
   kids: 'kids',
+  unisex: 'unisex',
 };
 
 const GENDERS = [
@@ -21,6 +22,7 @@ const GENDERS = [
   { id: 'men',   ar: 'رجالي',   en: 'Men'   },
   { id: 'women', ar: 'نسائي',   en: 'Women' },
   { id: 'kids',  ar: 'أطفال',   en: 'Kids'  },
+  { id: 'unisex', ar: 'للجنسين', en: 'Unisex' },
 ];
 
 const FRAME_SHAPES = [
@@ -98,7 +100,7 @@ export function EyeglassesPage() {
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
-    if (ordering) params.ordering = ordering;
+    params.ordering = ordering || '-id'; // newest first by default
     if (selectedBrands.length > 0) params.brand = selectedBrands.join(',');
     if (selectedShapes.length > 0) params.frame_shape = selectedShapes.join(',');
 
@@ -205,7 +207,7 @@ export function EyeglassesPage() {
                   onChange={e => setOrdering(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="">{t('الافتراضي', 'Default')}</option>
+                  <option value="">{t('الأحدث', 'Newest')}</option>
                   <option value="price">{t('السعر: الأقل أولاً', 'Price: Low to High')}</option>
                   <option value="-price">{t('السعر: الأعلى أولاً', 'Price: High to Low')}</option>
                   <option value="name">{t('الاسم أ-ي', 'Name A-Z')}</option>

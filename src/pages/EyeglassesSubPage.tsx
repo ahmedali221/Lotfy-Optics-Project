@@ -12,6 +12,7 @@ const GENDER_MAP: Record<string, string> = {
   men: 'male',
   women: 'female',
   kids: 'kids',
+  unisex: 'unisex',
 };
 
 const FRAME_SHAPES = [
@@ -26,6 +27,7 @@ const TITLES: Record<string, { ar: string; en: string }> = {
   men:   { ar: 'نظارات طبية رجالي',    en: "Men's Prescription Glasses"   },
   women: { ar: 'نظارات طبية نسائي',    en: "Women's Prescription Glasses" },
   kids:  { ar: 'نظارات طبية للأطفال',  en: 'Kids Prescription Glasses'    },
+  unisex: { ar: 'نظارات طبية للجنسين', en: 'Unisex Prescription Glasses' },
 };
 
 export function EyeglassesSubPage() {
@@ -80,7 +82,7 @@ export function EyeglassesSubPage() {
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
-    if (ordering) params.ordering = ordering;
+    params.ordering = ordering || '-id'; // newest first by default
 
     fetchAllPages<ApiProduct>('/api/catalog/products/', params)
       .then(setProducts)
@@ -139,7 +141,7 @@ export function EyeglassesSubPage() {
             <div className="bg-white rounded-xl p-4 border border-border shadow-sm">
               <h3 className="font-bold mb-3 text-sm">{t('ترتيب', 'Sort')}</h3>
               <select value={ordering} onChange={e => setOrdering(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                <option value="">{t('الافتراضي', 'Default')}</option>
+                <option value="">{t('الأحدث', 'Newest')}</option>
                 <option value="price">{t('السعر: الأقل', 'Price: Low to High')}</option>
                 <option value="-price">{t('السعر: الأعلى', 'Price: High to Low')}</option>
                 <option value="name">{t('الاسم', 'Name A-Z')}</option>
