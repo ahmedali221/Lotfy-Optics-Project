@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { ApiProductCard } from '../components/products/ApiProductCard';
-import { Search } from 'lucide-react';
+import { Search, Filter, ChevronDown } from 'lucide-react';
 import { ApiProduct, ApiBrand } from '../types/api';
 import { fetchAllPages } from '../lib/pagination';
 import { useRestoreScroll } from '../components/layout/ScrollToTop';
@@ -45,6 +45,7 @@ export function EyeglassesSubPage() {
   const [maxPrice, setMaxPrice] = useState(() => searchParams.get('max') ?? '');
   const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
   const [ordering, setOrdering] = useState(() => searchParams.get('sort') ?? '');
+  const [showFilters, setShowFilters] = useState(false);
 
   const [products, setProducts] = useState<ApiProduct[]>([]);
   const [brands, setBrands] = useState<ApiBrand[]>([]);
@@ -77,8 +78,7 @@ export function EyeglassesSubPage() {
     };
     const mappedGender = GENDER_MAP[category];
     if (mappedGender) params.gender = mappedGender;
-    if (selectedBrands.length === 1) params.brand = selectedBrands[0];
-    if (selectedShapes.length === 1) params.frame_shape = selectedShapes[0];
+    // Brands and shapes filter client-side below, so toggling them does not refetch.
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
@@ -88,7 +88,7 @@ export function EyeglassesSubPage() {
       .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [category, selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);
+  }, [category, minPrice, maxPrice, search, ordering]);
 
   useEffect(() => {
     const timer = setTimeout(fetchProducts, 300);
@@ -98,8 +98,8 @@ export function EyeglassesSubPage() {
   const uniqueColours = [...new Set(products.flatMap(p => p.images.map(i => i.colour)).filter(Boolean))].sort();
 
   const filtered = products.filter(p => {
-    if (selectedBrands.length > 1 && !(p.brand && selectedBrands.includes(p.brand.id))) return false;
-    if (selectedShapes.length > 1 && !(p.frame_shape && selectedShapes.includes(p.frame_shape))) return false;
+    if (selectedBrands.length > 0 && !(p.brand && selectedBrands.includes(p.brand.id))) return false;
+    if (selectedShapes.length > 0 &&!(p.frame_shape && selectedShapes.includes(p.frame_shape))) return false;
     if (selectedColours.length > 0 && !p.images.some(i => selectedColours.includes(i.colour))) return false;
     return true;
   });
@@ -125,9 +125,18 @@ export function EyeglassesSubPage() {
           </p>
         </div>
 
+        {/* Mobile filter toggle */}
+        <div className="lg:hidden mb-4">
+          <button onClick={() => setShowFilters(s => !s)} className="flex items-center gap-2 px-5 py-2 bg-secondary text-white rounded-lg text-sm">
+            <Filter className="w-4 h-4" />
+            {t('الفلاتر', 'Filters')}
+            <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-4">
+          <div className={`lg:col-span-1 space-y-4 ${showFilters ? 'block' : 'hidden lg:block'}`}>
 
             <div className="bg-white rounded-xl p-4 border border-border shadow-sm">
               <h3 className="font-bold mb-3 text-sm">{t('بحث', 'Search')}</h3>
@@ -207,7 +216,7 @@ export function EyeglassesSubPage() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
                     <div className="aspect-square bg-gray-100" />
@@ -216,7 +225,7 @@ export function EyeglassesSubPage() {
                 ))}
               </div>
             ) : filtered.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {filtered.map(p => <ApiProductCard key={p.id} product={p} />)}
               </div>
             ) : (

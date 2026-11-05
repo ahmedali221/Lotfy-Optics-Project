@@ -2,19 +2,34 @@ import { useLanguage } from '../../context/LanguageContext';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import { Glasses, Calendar, ChevronDown } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import hero from "../../assets/hero.png"
+import api from '../../lib/axios';
+import { resolveImageUrl } from '../products/ApiProductCard';
+
 export function HeroSlider() {
   const { language } = useLanguage();
+  // null while loading, so the bundled image does not flash before the uploaded one.
+  const [heroUrl, setHeroUrl] = useState<string | null>(null);
+
+  // Staff upload the header image in the dashboard; 404 means none was uploaded yet.
+  useEffect(() => {
+    api.get<{ image: string }>('/api/site/images/latest/', { params: { category: 'header' } })
+      .then(({ data }) => setHeroUrl(data.image ? resolveImageUrl(data.image) : hero))
+      .catch(() => setHeroUrl(hero));
+  }, []);
 
   return (
-    <div className="relative h-screen overflow-hidden">
+    <div className="relative h-screen overflow-hidden bg-secondary">
       {/* Background Image with Overlay */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${hero})`,
-        }}
-      />
+      {heroUrl && (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${heroUrl})`,
+          }}
+        />
+      )}
 
       <div className="absolute inset-0 bg-gradient-to-r from-secondary/90 to-secondary/20" />
 

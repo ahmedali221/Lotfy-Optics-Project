@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { useParams, Link, useNavigate } from 'react-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
@@ -52,6 +53,7 @@ export function ProductDetailPage() {
   const [product, setProduct] = useState<ApiProduct | null>(null);
   const [related, setRelated] = useState<ApiProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const touchStartX = useRef<number | null>(null);
@@ -72,23 +74,32 @@ export function ProductDetailPage() {
     touchStartX.current = null;
   };
 
+  // Every detail GET counts as one product visit, so it runs once per product page view.
   useEffect(() => {
     if (!id) return;
     setLoading(true);
+    setNotFound(false);
+    setProduct(null);
+    setRelated([]);
     setQuantity(1);
     setSelectedImage(0);
     api.get<ApiProduct>(`/api/catalog/products/${id}/`)
       .then(({ data }) => {
         setProduct(data);
-        return api.get('/api/catalog/products/', {
+        api.get('/api/catalog/products/', {
           params: { category: data.category, is_active: 'true', page_size: 5 },
-        });
+        })
+          .then(({ data }) => {
+            const results: ApiProduct[] = data.results ?? data;
+            setRelated(results.filter((p: ApiProduct) => p.id !== Number(id)).slice(0, 4));
+          })
+          .catch(() => {});
       })
-      .then(({ data }) => {
-        const results: ApiProduct[] = data.results ?? data;
-        setRelated(results.filter((p: ApiProduct) => p.id !== Number(id)).slice(0, 4));
+      .catch(err => {
+        // Inactive or deleted products return 404 for customers.
+        if (axios.isAxiosError(err) && err.response?.status === 404) setNotFound(true);
+        else navigate('/');
       })
-      .catch(() => navigate('/'))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -109,6 +120,28 @@ export function ProductDetailPage() {
               <div className="h-10 bg-gray-100 rounded w-1/2" />
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen bg-background py-16">
+        <div className="container mx-auto px-4 text-center">
+          <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-40" />
+          <h1 className="text-2xl font-bold text-secondary mb-2">
+            {t('هذا المنتج غير متاح حالياً', 'This product is not available')}
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            {t('ربما تم إيقافه أو إزالته من المتجر.', 'It may have been hidden or removed from the store.')}
+          </p>
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            {t('العودة إلى الرئيسية', 'Back to Home')}
+          </Link>
         </div>
       </div>
     );
@@ -590,7 +623,7 @@ export function ProductDetailPage() {
         {related.length > 0 && (
           <div>
             <h2 className="mb-6">{t('منتجات مشابهة', 'Similar Products')}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {related.map(p => <ApiProductCard key={p.id} product={p} />)}
             </div>
           </div>

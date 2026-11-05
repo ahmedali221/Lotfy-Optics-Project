@@ -68,7 +68,7 @@ export function SunglassesPage() {
       .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [activeGender, selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);
+  }, [activeGender, minPrice, maxPrice, search, ordering]); // brands/shapes filter client-side, no refetch
 
   useEffect(() => {
     const timer = setTimeout(fetchSunProducts, 300);
@@ -228,7 +228,7 @@ export function SunglassesPage() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
                     <div className="aspect-square bg-gray-100" />
@@ -237,7 +237,7 @@ export function SunglassesPage() {
                 ))}
               </div>
             ) : sunFiltered.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                 {sunFiltered.map(p => <ApiProductCard key={p.id} product={p} />)}
               </div>
             ) : (
@@ -294,7 +294,7 @@ export function LensesPage() {
       .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [selectedBrands, minPrice, maxPrice, search, ordering]);
+  }, [minPrice, maxPrice, search, ordering]); // brands filter client-side, no refetch
 
   useEffect(() => {
     const timer = setTimeout(fetchProducts, 300);
@@ -474,7 +474,7 @@ export function LensesPage() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
                     <div className="aspect-square bg-gray-100" />
@@ -483,7 +483,7 @@ export function LensesPage() {
                 ))}
               </div>
             ) : filtered.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                 {filtered.map(p => <ApiProductCard key={p.id} product={p} />)}
               </div>
             ) : (

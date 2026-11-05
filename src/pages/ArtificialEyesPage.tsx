@@ -36,14 +36,15 @@ export function ArtificialEyesPage() {
     if (search) params.name = search;
     params.ordering = ordering || '-id'; // newest first by default
     fetchAllPages<ApiProduct>('/api/catalog/products/', params)
-      .then(data => {
-        let results = data;
-        if (selectedBrands.length > 0) results = results.filter(p => p.brand && selectedBrands.includes(p.brand.id));
-        setProducts(results);
-      })
+      .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [selectedBrands, minPrice, maxPrice, search, ordering]);
+  }, [minPrice, maxPrice, search, ordering]);
+
+  // Brand filter runs client-side so toggling a brand does not refetch.
+  const filteredProducts = selectedBrands.length > 0
+    ? products.filter(p => p.brand && selectedBrands.includes(p.brand.id))
+    : products;
 
   useEffect(() => {
     const t = setTimeout(fetchProducts, 300);
@@ -314,11 +315,11 @@ export function ArtificialEyesPage() {
                   />
                 </div>
                 <p className="text-sm text-muted-foreground whitespace-nowrap">
-                  {loading ? t('جارٍ التحميل...', 'Loading...') : t(`${products.length} منتج`, `${products.length} product${products.length !== 1 ? 's' : ''}`)}
+                  {loading ? t('جارٍ التحميل...', 'Loading...') : t(`${filteredProducts.length} منتج`, `${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''}`)}
                 </p>
               </div>
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                   {Array.from({ length: 6 }).map((_, i) => (
                     <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
                       <div className="aspect-square bg-gray-100" />
@@ -326,9 +327,9 @@ export function ArtificialEyesPage() {
                     </div>
                   ))}
                 </div>
-              ) : products.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {products.map(p => <ApiProductCard key={p.id} product={p} />)}
+              ) : filteredProducts.length > 0 ? (
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
+                  {filteredProducts.map(p => <ApiProductCard key={p.id} product={p} />)}
                 </div>
               ) : (
                 <div className="text-center py-16">

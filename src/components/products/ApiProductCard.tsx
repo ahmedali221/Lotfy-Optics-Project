@@ -65,11 +65,11 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
       {/* Wishlist */}
       <button
         onClick={handleToggleWishlist}
-        className="absolute top-3 end-3 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all shadow-md"
+        className="absolute top-2 end-2 sm:top-3 sm:end-3 z-10 p-1.5 sm:p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all shadow-md"
         aria-label={language === 'ar' ? 'المفضلة' : 'Wishlist'}
       >
         <Heart
-          className={`w-5 h-5 transition-all ${
+          className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${
             inWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600 hover:text-red-500'
           }`}
         />
@@ -100,7 +100,7 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
       </div>
 
       {/* Info */}
-      <div className="p-4">
+      <div className="p-2.5 sm:p-4">
         <h3 className="line-clamp-2 mb-1 text-sm font-semibold group-hover:text-primary transition-colors">
           {product.name}
         </h3>
@@ -108,10 +108,10 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
           <p className="text-xs text-muted-foreground mb-2">{product.brand.name}</p>
         )}
 
-        <div className="flex items-center justify-between mt-3 gap-2">
+        <div className="flex items-center justify-between mt-2 sm:mt-3 gap-1.5 sm:gap-2">
           <div className="flex flex-col min-w-0">
             <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-lg font-bold text-primary">{formatPrice(price)}</span>
+              <span className="text-sm sm:text-lg font-bold text-primary">{formatPrice(price)}</span>
               {discountPct && (
                 <span className="text-xs text-muted-foreground line-through">{formatPrice(prevPrice!)}</span>
               )}
@@ -125,14 +125,14 @@ export function ApiProductCard({ product }: ApiProductCardProps) {
           <button
             onClick={handleAddToCart}
             disabled={inCart || isOutOfStock}
-            className={`p-2 rounded-lg transition-colors ${
+            className={`shrink-0 p-1.5 sm:p-2 rounded-lg transition-colors ${
               inCart || isOutOfStock
                 ? 'bg-gray-200 cursor-not-allowed text-gray-400'
                 : 'bg-primary hover:bg-primary-dark text-white'
             }`}
             aria-label={language === 'ar' ? 'أضف للسلة' : 'Add to cart'}
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 

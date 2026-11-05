@@ -46,15 +46,15 @@ export function LightFiltersPage() {
     if (search) params.name = search;
     params.ordering = ordering || '-id'; // newest first by default
     fetchAllPages<ApiProduct>('/api/catalog/products/', params)
-      .then(data => {
-        let results = data;
-        if (selectedBrands.length > 0) results = results.filter(p => p.brand && selectedBrands.includes(p.brand.id));
-        if (selectedShapes.length > 0) results = results.filter(p => p.frame_shape && selectedShapes.includes(p.frame_shape));
-        setProducts(results);
-      })
+      .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);
+  }, [minPrice, maxPrice, search, ordering]);
+
+  // Brand/shape filters run client-side so toggling them does not refetch.
+  const filteredProducts = products.filter(p =>
+    (selectedBrands.length === 0 || (p.brand && selectedBrands.includes(p.brand.id))) &&
+    (selectedShapes.length === 0 || (p.frame_shape && selectedShapes.includes(p.frame_shape))));
 
   useEffect(() => {
     const timer = setTimeout(fetchProducts, 300);
@@ -394,7 +394,7 @@ export function LightFiltersPage() {
             {/* Products Grid */}
             <div className="lg:col-span-3">
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
                       <div className="aspect-square bg-gray-200" />
@@ -405,7 +405,7 @@ export function LightFiltersPage() {
                     </div>
                   ))}
                 </div>
-              ) : products.length > 0 ? (
+              ) : filteredProducts.length > 0 ? (
                 <>
                   <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="relative flex-1 max-w-md">
@@ -418,11 +418,11 @@ export function LightFiltersPage() {
                       />
                     </div>
                     <p className="text-sm text-muted-foreground whitespace-nowrap">
-                      {tl(`${products.length} منتج`, `${products.length} products`)}
+                      {tl(`${filteredProducts.length} منتج`, `${filteredProducts.length} products`)}
                     </p>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {products.map(p => (
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+                    {filteredProducts.map(p => (
                       <ApiProductCard key={p.id} product={p} />
                     ))}
                   </div>

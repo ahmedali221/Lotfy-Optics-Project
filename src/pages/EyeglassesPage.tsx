@@ -37,7 +37,9 @@ export function EyeglassesPage() {
   const { language } = useLanguage();
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') === 'sunglasses' ? 'sunglasses' : 'medical';
+  const tabParam = searchParams.get('tab');
+  const activeTab = tabParam === 'sunglasses' || tabParam === 'lens' ? tabParam : 'medical';
+  const isLens = activeTab === 'lens';
 
   // Filters start from the URL so Back from a product page restores them.
   const [activeGender, setActiveGender] = useState(() => searchParams.get('gender') ?? 'all');
@@ -90,25 +92,22 @@ export function EyeglassesPage() {
 
   const fetchProducts = useCallback(() => {
     setLoading(true);
-    const params: Record<string, string | number> = {
-      category: 'glasses',
-      lens_type: activeTab,
-      page_size: 100,
-      is_active: 'true',
-    };
-    if (GENDER_MAP[activeGender]) params.gender = GENDER_MAP[activeGender];
+    // Lenses are their own category; glasses split into medical / sunglasses by lens_type.
+    const params: Record<string, string | number> = isLens
+      ? { category: 'lens', page_size: 100, is_active: 'true' }
+      : { category: 'glasses', lens_type: activeTab, page_size: 100, is_active: 'true' };
+    if (!isLens && GENDER_MAP[activeGender]) params.gender = GENDER_MAP[activeGender];
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
     params.ordering = ordering || '-id'; // newest first by default
-    if (selectedBrands.length > 0) params.brand = selectedBrands.join(',');
-    if (selectedShapes.length > 0) params.frame_shape = selectedShapes.join(',');
+    // Brands and shapes filter client-side below, so toggling them does not refetch.
 
     fetchAllPages<ApiProduct>('/api/catalog/products/', params)
       .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [activeTab, activeGender, selectedBrands, selectedShapes, minPrice, maxPrice, search, ordering]);
+  }, [activeTab, isLens, activeGender, minPrice, maxPrice, search, ordering]);
 
   useEffect(() => {
     const timer = setTimeout(fetchProducts, 300);
@@ -119,7 +118,7 @@ export function EyeglassesPage() {
 
   const filtered = products.filter(p => {
     if (selectedBrands.length > 0 && !(p.brand && selectedBrands.includes(p.brand.id))) return false;
-    if (selectedShapes.length > 0 && !(p.frame_shape && selectedShapes.includes(p.frame_shape))) return false;
+    if (!isLens && selectedShapes.length > 0 && !(p.frame_shape && selectedShapes.includes(p.frame_shape))) return false;
     if (selectedColours.length > 0 && !p.images.some(i => selectedColours.includes(i.colour))) return false;
     return true;
   });
@@ -154,32 +153,44 @@ export function EyeglassesPage() {
           <div className="inline-block mb-4 px-5 py-1.5 bg-primary/20 border border-primary/30 rounded-full text-sm text-primary">
             {activeTab === 'sunglasses'
               ? t('✨ نظارات شمسية عالية الجودة', '✨ Premium Sunglasses')
+              : isLens
+              ? t('✨ عدسات عالية الجودة', '✨ Premium Lenses')
               : t('✨ نظارات طبية عالية الجودة', '✨ Premium Prescription Eyewear')}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             {activeTab === 'sunglasses'
               ? t('نظارات شمسية بأحدث التصاميم', 'Sunglasses with the Latest Designs')
+              : isLens
+              ? t('عدسات لاصقة وطبية', 'Contact & Prescription Lenses')
               : t('نظارات طبية للرؤية الواضحة', 'Prescription Glasses for Clear Vision')}
           </h1>
           <p className="text-lg text-white/85 max-w-2xl mx-auto">
             {activeTab === 'sunglasses'
               ? t('اختر من بين مجموعة واسعة من النظارات الشمسية العصرية', 'Choose from a wide range of modern sunglasses')
+              : isLens
+              ? t('اختر من بين مجموعة واسعة من العدسات', 'Choose from a wide range of lenses')
               : t('اختر من بين مجموعة واسعة من الإطارات الطبية العصرية', 'Choose from a wide range of modern prescription frames')}
           </p>
 
           {/* Tab Switcher */}
           <div className="mt-8 inline-flex bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-1">
             <button
-              className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'medical' ? 'bg-primary text-white shadow-lg' : 'text-white/80 hover:text-white'}`}
+              className={`px-4 sm:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'medical' ? 'bg-primary text-white shadow-lg' : 'text-white/80 hover:text-white'}`}
               onClick={() => setSearchParams({})}
             >
               {t('نظارات النظر', 'Prescription')}
             </button>
             <button
-              className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'sunglasses' ? 'bg-primary text-white shadow-lg' : 'text-white/80 hover:text-white'}`}
+              className={`px-4 sm:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'sunglasses' ? 'bg-primary text-white shadow-lg' : 'text-white/80 hover:text-white'}`}
               onClick={() => setSearchParams({ tab: 'sunglasses' })}
             >
               {t('نظارات الشمس', 'Sunglasses')}
+            </button>
+            <button
+              className={`px-4 sm:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'lens' ? 'bg-primary text-white shadow-lg' : 'text-white/80 hover:text-white'}`}
+              onClick={() => setSearchParams({ tab: 'lens' })}
+            >
+              {t('العدسات', 'Lenses')}
             </button>
           </div>
         </div>
@@ -214,7 +225,8 @@ export function EyeglassesPage() {
                 </select>
               </div>
 
-              {/* Gender */}
+              {/* Gender (not used for lenses) */}
+              {!isLens && (
               <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                 <h3 className="font-bold mb-3 text-sm">{t('الجنس', 'Gender')}</h3>
                 <div className="space-y-2">
@@ -232,6 +244,7 @@ export function EyeglassesPage() {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Price Range */}
               <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
@@ -301,7 +314,8 @@ export function EyeglassesPage() {
                 </div>
               )}
 
-              {/* Frame Shape */}
+              {/* Frame Shape (glasses only) */}
+              {!isLens && (
               <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                 <h3 className="font-bold mb-3 text-sm">{t('شكل الإطار', 'Frame Shape')}</h3>
                 <div className="space-y-2">
@@ -318,6 +332,7 @@ export function EyeglassesPage() {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Colour */}
               {uniqueColours.length > 0 && (
@@ -364,7 +379,7 @@ export function EyeglassesPage() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="bg-white rounded-lg border border-border overflow-hidden animate-pulse">
                     <div className="aspect-square bg-gray-100" />
@@ -376,7 +391,7 @@ export function EyeglassesPage() {
                 ))}
               </div>
             ) : filtered.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                 {filtered.map(p => <ApiProductCard key={p.id} product={p} />)}
               </div>
             ) : (

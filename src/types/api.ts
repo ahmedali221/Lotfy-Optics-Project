@@ -15,6 +15,7 @@ export interface ApiProduct {
   previous_price: string | null;
   stock_quantity: number;
   is_active: boolean;
+  is_deleted?: boolean;   // always false on the public API (deleted products return 404)
   images: { id: number; image: string; sort_order: number; colour: string }[];
 }
 
