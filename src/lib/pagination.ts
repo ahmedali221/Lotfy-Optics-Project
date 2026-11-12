@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import api from './axios';
 
 // The API returns absolute `next` URLs. Keep only path + query so the request
@@ -19,4 +20,81 @@ export async function fetchAllPages<T>(url: string, params: Record<string, unkno
     items.push(...data.results);
   }
   return items;
+}
+
+const MAX_PAGE_SIZE = 100;
+const SIZE_KEY = 'infiniteList:';
+
+const currentListKey = () => SIZE_KEY + window.location.pathname + window.location.search;
+
+function readSavedSize(): number {
+  try {
+    return Number(sessionStorage.getItem(currentListKey())) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveSize(size: number) {
+  try {
+    sessionStorage.setItem(currentListKey(), String(size));
+  } catch { /* storage unavailable: Back reloads only the first batch */ }
+}
+
+// Infinite scroll over a cursor-paginated endpoint. `load` fetches the first
+// batch (call it again when filters change); `loadMore` follows the `next`
+// cursor link and appends. The loaded count is remembered per URL, so Back from
+// a product reloads enough items to reach the saved scroll position (up to 100).
+export function useInfiniteList<T>(pageSize = 12) {
+  const [items, setItems] = useState<T[]>([]);
+  const [next, setNext] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadMoreFailed, setLoadMoreFailed] = useState(false);
+  // Responses from an older `load` (filters changed meanwhile) are dropped.
+  const request = useRef(0);
+
+  const load = useCallback(async (url: string, params: Record<string, unknown>) => {
+    const id = ++request.current;
+    setLoading(true);
+    setNext(null);
+    setLoadingMore(false);
+    setLoadMoreFailed(false);
+    try {
+      const size = Math.min(MAX_PAGE_SIZE, Math.max(pageSize, readSavedSize()));
+      const { data } = await api.get(url, { params: { ...params, page_size: size } });
+      if (id !== request.current) return;
+      setItems(data.results ?? data);
+      setNext(data.next ?? null);
+    } catch (err) {
+      if (id !== request.current) return;
+      setItems([]);
+      throw err;
+    } finally {
+      if (id === request.current) setLoading(false);
+    }
+  }, [pageSize]);
+
+  const loadMore = useCallback(async () => {
+    if (!next || loading || loadingMore) return;
+    const id = request.current;
+    setLoadingMore(true);
+    setLoadMoreFailed(false);
+    try {
+      const { data } = await api.get(toApiPath(next));
+      if (id !== request.current) return;
+      setItems(prev => [...prev, ...data.results]);
+      setNext(data.next ?? null);
+    } catch {
+      if (id === request.current) setLoadMoreFailed(true);
+    } finally {
+      if (id === request.current) setLoadingMore(false);
+    }
+  }, [next, loading, loadingMore]);
+
+  useEffect(() => {
+    if (!loading) saveSize(items.length);
+  }, [items, loading]);
+
+  return { items, loading, loadingMore, loadMoreFailed, hasMore: !!next, load, loadMore };
 }

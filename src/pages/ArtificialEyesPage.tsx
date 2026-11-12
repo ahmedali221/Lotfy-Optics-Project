@@ -4,16 +4,17 @@ import { Check, Phone, Search, Filter, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router';
 import { ApiProduct, ApiBrand } from '../types/api';
 import { ApiProductCard } from '../components/products/ApiProductCard';
-import { fetchAllPages } from '../lib/pagination';
+import { fetchAllPages, useInfiniteList } from '../lib/pagination';
+import { LoadMoreSentinel } from '../components/products/LoadMoreSentinel';
 
 export function ArtificialEyesPage() {
   const { language } = useLanguage();
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
 
   // Products state
-  const [products, setProducts] = useState<ApiProduct[]>([]);
+  const list = useInfiniteList<ApiProduct>();
+  const { items: products, loading, load } = list;
   const [brands, setBrands] = useState<ApiBrand[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
   const [minPrice, setMinPrice] = useState('');
@@ -28,23 +29,18 @@ export function ArtificialEyesPage() {
   }, []);
 
   const fetchProducts = useCallback(() => {
-    setLoading(true);
-    const params: Record<string, string | number> = { category: 'artificial_eyes', page_size: 100 };
+    const params: Record<string, string> = { category: 'artificial_eyes' };
 
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
+    if (selectedBrands.length) params.brand = selectedBrands.join(',');
     params.ordering = ordering || '-id'; // newest first by default
-    fetchAllPages<ApiProduct>('/api/catalog/products/', params)
-      .then(setProducts)
-      .catch(() => setProducts([]))
-      .finally(() => setLoading(false));
-  }, [minPrice, maxPrice, search, ordering]);
+    load('/api/catalog/products/', params).catch(() => {});
+  }, [load, minPrice, maxPrice, search, selectedBrands, ordering]);
 
-  // Brand filter runs client-side so toggling a brand does not refetch.
-  const filteredProducts = selectedBrands.length > 0
-    ? products.filter(p => p.brand && selectedBrands.includes(p.brand.id))
-    : products;
+  // No total count from the API: "+" means more products load on scroll.
+  const countLabel = `${products.length}${list.hasMore ? '+' : ''}`;
 
   useEffect(() => {
     const t = setTimeout(fetchProducts, 300);
@@ -315,7 +311,7 @@ export function ArtificialEyesPage() {
                   />
                 </div>
                 <p className="text-sm text-muted-foreground whitespace-nowrap">
-                  {loading ? t('جارٍ التحميل...', 'Loading...') : t(`${filteredProducts.length} منتج`, `${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''}`)}
+                  {loading ? t('جارٍ التحميل...', 'Loading...') : t(`${countLabel} منتج`, `${countLabel} product${countLabel !== '1' ? 's' : ''}`)}
                 </p>
               </div>
               {loading ? (
@@ -327,10 +323,13 @@ export function ArtificialEyesPage() {
                     </div>
                   ))}
                 </div>
-              ) : filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
-                  {filteredProducts.map(p => <ApiProductCard key={p.id} product={p} />)}
-                </div>
+              ) : products.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
+                    {products.map(p => <ApiProductCard key={p.id} product={p} />)}
+                  </div>
+                  <LoadMoreSentinel hasMore={list.hasMore} loading={list.loadingMore} failed={list.loadMoreFailed} onLoadMore={list.loadMore} />
+                </>
               ) : (
                 <div className="text-center py-16">
                   <div className="text-6xl mb-4">👁️</div>

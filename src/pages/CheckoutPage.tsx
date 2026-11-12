@@ -11,6 +11,7 @@ import { toast } from 'sonner@2.0.3';
 import api from '../lib/axios';
 import { getApiError } from '../lib/apiError';
 import { fetchAllPages } from '../lib/pagination';
+import { parseFreeShippingThreshold, qualifiesForFreeShipping } from '../hooks/useFreeShippingThreshold';
 
 interface PaymentMethodType {
   id: number;
@@ -33,6 +34,7 @@ export function CheckoutPage() {
   const [governorates, setGovernorates] = useState<string[]>([]);
   const [selectedMethodId, setSelectedMethodId] = useState<number | null>(null);
   const [depositAmount, setDepositAmount] = useState(100);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -51,7 +53,9 @@ export function CheckoutPage() {
   const [proofPreview, setProofPreview] = useState<string | null>(null);
 
   const subtotal = getTotal();
-  const shippingCost = formData.governorate ? (apiDeliveryFees[formData.governorate] ?? 0) : 0;
+  // Mirrors the backend: orders reaching the threshold pay no delivery fee.
+  const freeShipping = qualifiesForFreeShipping(subtotal, freeShippingThreshold);
+  const shippingCost = formData.governorate && !freeShipping ? (apiDeliveryFees[formData.governorate] ?? 0) : 0;
   const total = subtotal + shippingCost;
   const remaining = total - depositAmount;
 
@@ -80,6 +84,7 @@ export function CheckoutPage() {
 
     api.get('/api/orders/checkout-config/').then(res => {
       setDepositAmount(parseFloat(res.data.deposit_amount));
+      setFreeShippingThreshold(parseFreeShippingThreshold(res.data.free_shipping_threshold));
     }).catch(() => {});
   }, [items.length, navigate]);
 
@@ -320,7 +325,9 @@ export function CheckoutPage() {
                         {governorates.map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
                       {formData.governorate && (
-                        <p className="text-xs text-muted-foreground mt-1">{t('رسوم الشحن:', 'Shipping:')} {apiDeliveryFees[formData.governorate]} {t('جنيه', 'EGP')}</p>
+                        freeShipping
+                          ? <p className="text-xs text-green-600 mt-1">{t('شحن مجاني', 'Free shipping')}</p>
+                          : <p className="text-xs text-muted-foreground mt-1">{t('رسوم الشحن:', 'Shipping:')} {apiDeliveryFees[formData.governorate]} {t('جنيه', 'EGP')}</p>
                       )}
                     </div>
                     <div>
@@ -612,7 +619,11 @@ export function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{t('الشحن', 'Shipping')}</span>
-                  <span className="font-medium">{shippingCost > 0 ? `${shippingCost} ${t('جنيه', 'EGP')}` : '-'}</span>
+                  <span className="font-medium">
+                    {freeShipping
+                      ? <span className="text-green-600">{t('مجاني', 'Free')}</span>
+                      : shippingCost > 0 ? `${shippingCost} ${t('جنيه', 'EGP')}` : '-'}
+                  </span>
                 </div>
                 <div className="border-t border-border pt-3">
                   <div className="flex justify-between mb-2">

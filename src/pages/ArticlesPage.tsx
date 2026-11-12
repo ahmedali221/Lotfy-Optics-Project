@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { fetchAllPages } from '../lib/pagination';
+import { useInfiniteList } from '../lib/pagination';
+import { LoadMoreSentinel } from '../components/products/LoadMoreSentinel';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://165.227.137.145:8080';
 
@@ -328,40 +329,45 @@ const articles: Article[] = [
   },
 ];
 
+interface ApiArticle {
+  id: number;
+  title: string;
+  subtitle: string;
+  image: string | null;
+  author: string;
+  minutes_to_read: number;
+  published_date: string;
+}
+
 export function ArticlesPage() {
   const { language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [apiArticles, setApiArticles] = useState<Article[]>([]);
+  // API articles load in batches as the page scrolls (cursor pagination).
+  // Search runs on the server for them, debounced while typing.
+  const list = useInfiniteList<ApiArticle>();
+  const { load } = list;
 
   useEffect(() => {
-    fetchAllPages<{
-      id: number;
-      title: string;
-      subtitle: string;
-      image: string | null;
-      author: string;
-      minutes_to_read: number;
-      published_date: string;
-    }>('/api/articles/')
-      .then(results => {
-        const mapped: Article[] = results.map(a => ({
-          id: `api-${a.id}`,
-          slug: `api-${a.id}`,
-          title: { ar: a.title, en: a.title },
-          excerpt: { ar: a.subtitle, en: a.subtitle },
-          author: { ar: a.author, en: a.author },
-          date: formatDateBilingual(a.published_date),
-          category: { ar: 'مقالات', en: 'Articles' },
-          categoryColor: 'primary',
-          image: resolveArticleImage(a.image),
-          readTime: { ar: `${a.minutes_to_read} دقائق قراءة`, en: `${a.minutes_to_read} min read` },
-          views: 0,
-        }));
-        setApiArticles(mapped);
-      })
-      .catch(() => {});
-  }, []);
+    const timer = setTimeout(() => {
+      load('/api/articles/', searchTerm ? { search: searchTerm } : {}).catch(() => {});
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [load, searchTerm]);
+
+  const apiArticles: Article[] = list.items.map(a => ({
+    id: `api-${a.id}`,
+    slug: `api-${a.id}`,
+    title: { ar: a.title, en: a.title },
+    excerpt: { ar: a.subtitle, en: a.subtitle },
+    author: { ar: a.author, en: a.author },
+    date: formatDateBilingual(a.published_date),
+    category: { ar: 'مقالات', en: 'Articles' },
+    categoryColor: 'primary',
+    image: resolveArticleImage(a.image),
+    readTime: { ar: `${a.minutes_to_read} دقائق قراءة`, en: `${a.minutes_to_read} min read` },
+    views: 0,
+  }));
 
   const categories = [
     { value: 'all', label: { ar: 'جميع المقالات', en: 'All Articles' } },
@@ -373,19 +379,25 @@ export function ArticlesPage() {
     { value: 'tips', label: { ar: 'نصائح عامة', en: 'General Tips' } },
   ];
 
-  const allArticles = [...apiArticles, ...articles];
+  const matchesCategory = (article: Article) =>
+    selectedCategory === 'all' ||
+    article.category[language].toLowerCase().includes(categories.find(c => c.value === selectedCategory)?.label[language].toLowerCase() || '');
 
-  const filteredArticles = allArticles.filter((article) => {
-    const matchesSearch =
+  // API articles are already searched by the server; only their category is checked here.
+  const showApiArticles = apiArticles.some(matchesCategory);
+  const filteredApiArticles = showApiArticles ? apiArticles.filter(matchesCategory) : [];
+
+  // Built-in articles are searched locally and shown after the last API batch.
+  const filteredStaticArticles = articles.filter(article =>
+    matchesCategory(article) && (
       article.title[language].toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.excerpt[language].toLowerCase().includes(searchTerm.toLowerCase());
+      article.excerpt[language].toLowerCase().includes(searchTerm.toLowerCase())
+    ));
 
-    const matchesCategory =
-      selectedCategory === 'all' ||
-      article.category[language].toLowerCase().includes(categories.find(c => c.value === selectedCategory)?.label[language].toLowerCase() || '');
-
-    return matchesSearch && matchesCategory;
-  });
+  const apiHasMore = showApiArticles && list.hasMore;
+  const filteredArticles = apiHasMore
+    ? filteredApiArticles
+    : [...filteredApiArticles, ...filteredStaticArticles];
 
   return (
     <div className="min-h-screen bg-background">
@@ -500,12 +512,15 @@ export function ArticlesPage() {
                   </Link>
                 ))}
               </div>
-            ) : (
+            ) : list.loading ? null : (
               <div className="text-center py-16">
                 <p className="text-muted-foreground text-lg">
                   {language === 'ar' ? 'لا توجد مقالات تطابق بحثك' : 'No articles match your search'}
                 </p>
               </div>
+            )}
+            {apiHasMore && (
+              <LoadMoreSentinel hasMore loading={list.loadingMore} failed={list.loadMoreFailed} onLoadMore={list.loadMore} />
             )}
           </div>
         </div>

@@ -23,8 +23,8 @@ export function BranchesPage() {
       id: 'hoqoqyin',
       name: t('branches.hoqoqyin'),
       address: {
-        ar: 'أسيوط - تقسيم الحقوقيين بج الفيروز خلف مساكن عزبه السجن بجوار برج الحريه',
-        en: 'Assiut - Hoqoqyin Division, Al Fayrouz Building, behind Ezbet El Segn residences, next to El Horreya Tower',
+        ar: 'أسيوط - مدخل تقسيم الحقوقيين من عزبه السجن بجوار برج الحريه وجمله المنصور',
+        en: 'Assiut - Hoqoqyin Division entrance from Ezbet El Segn, next to El Horreya Tower and Gomlet El Mansour',
       },
       phone: '01037839913',
       hours: {

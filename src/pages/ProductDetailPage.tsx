@@ -14,6 +14,7 @@ import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { toast } from 'sonner@2.0.3';
 import api from '../lib/axios';
+import { useFreeShippingThreshold } from '../hooks/useFreeShippingThreshold';
 
 const CATEGORY_LABELS: Record<string, { ar: string; en: string }> = {
   glasses:        { ar: 'نظارات',     en: 'Glasses'       },
@@ -49,6 +50,7 @@ export function ProductDetailPage() {
   const { addItem, isInCart } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
+  const freeShippingThreshold = useFreeShippingThreshold();
 
   const [product, setProduct] = useState<ApiProduct | null>(null);
   const [related, setRelated] = useState<ApiProduct[]>([]);
@@ -479,13 +481,17 @@ export function ProductDetailPage() {
 
             {/* Shipping Info */}
             <div className="bg-background border border-border rounded-lg p-4 space-y-3">
-              <div className="flex items-start gap-3">
-                <Truck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium">{t('توصيل مجاني', 'Free Delivery')}</p>
-                  <p className="text-sm text-muted-foreground">{t('للطلبات فوق 1500 جنيه', 'For orders over 1500 EGP')}</p>
+              {freeShippingThreshold !== null && (
+                <div className="flex items-start gap-3">
+                  <Truck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">{t('توصيل مجاني', 'Free Delivery')}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t(`للطلبات من ${freeShippingThreshold.toLocaleString()} جنيه`, `For orders from ${freeShippingThreshold.toLocaleString()} EGP`)}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="flex items-start gap-3">
                 <RotateCcw className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>

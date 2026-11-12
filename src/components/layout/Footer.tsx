@@ -97,7 +97,7 @@ export function Footer() {
                 <MapPin className="w-4 h-4 text-[#d4af37] flex-shrink-0" />
                 <div className="text-sm text-gray-300 text-right leading-relaxed">
                   <div className="mb-2"> أسيوط - فريال شارع الحسن و الحسين متفرع من العدلي امام مخبز قراقيش و بجوار بريد الزهراء</div>
-                  <div>أسيوط - تقسيم الحقوقيين برج الفيروز خلف مساكن عزبه السجن بجوار برج الحريه</div>
+                  <div>أسيوط - مدخل تقسيم الحقوقيين من عزبه السجن بجوار برج الحريه وجمله المنصور</div>
                 </div>
               </li>
             </ul>

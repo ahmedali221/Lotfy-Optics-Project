@@ -166,8 +166,8 @@ export function ContactPage() {
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
                       {language === 'ar'
-                        ? 'أسيوط تقسيم الحقوقيين برج الفيروز خلف مساكن عزبه السجن بجوار برجّ الحريه'
-                        : 'Assiut - Hoqoqyin Division, Al Fayrouz Building, behind Ezbet El Segn residences, next to El Horreya Tower'}
+                        ? 'أسيوط مدخل تقسيم الحقوقيين من عزبه السجن بجوار برج الحريه وجمله المنصور'
+                        : 'Assiut - Hoqoqyin Division entrance from Ezbet El Segn, next to El Horreya Tower and Gomlet El Mansour'}
                     </a>
                     <div className="mt-2">
                       <a href="tel:01037839913" className="text-primary font-medium hover:underline">

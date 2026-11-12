@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { resolveImageUrl } from '../components/products/ApiProductCard';
+import { qualifiesForFreeShipping, useFreeShippingThreshold } from '../hooks/useFreeShippingThreshold';
 
 export function CartPage() {
   const { language } = useLanguage();
@@ -12,8 +13,10 @@ export function CartPage() {
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
 
   const subtotal = getTotal();
-  const shipping = subtotal > 500 ? 0 : 50;
-  const total = subtotal + shipping;
+  const freeShippingThreshold = useFreeShippingThreshold();
+  const freeShipping = qualifiesForFreeShipping(subtotal, freeShippingThreshold);
+  // Delivery fee depends on the governorate, so it is added at checkout.
+  const total = subtotal;
 
   if (items.length === 0) {
     return (
@@ -143,15 +146,15 @@ export function CartPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{t('الشحن', 'Shipping')}</span>
                   <span className="font-medium">
-                    {shipping === 0
+                    {freeShipping
                       ? <span className="text-green-600">{t('مجاني', 'Free')}</span>
-                      : `${shipping} ${t('جنيه', 'EGP')}`
+                      : t('يُحسب عند الدفع', 'Calculated at checkout')
                     }
                   </span>
                 </div>
-                {shipping > 0 && (
+                {freeShippingThreshold !== null && !freeShipping && (
                   <p className="text-xs text-muted-foreground">
-                    {t(`أضف ${500 - Math.round(subtotal)} جنيه للشحن المجاني`, `Add ${500 - Math.round(subtotal)} EGP for free shipping`)}
+                    {t(`أضف ${Math.ceil(freeShippingThreshold - subtotal)} جنيه للشحن المجاني`, `Add ${Math.ceil(freeShippingThreshold - subtotal)} EGP for free shipping`)}
                   </p>
                 )}
                 <div className="border-t border-border pt-3">

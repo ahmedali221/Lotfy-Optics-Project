@@ -4,7 +4,8 @@ import { ApiProductCard } from '../components/products/ApiProductCard';
 import { Check, Phone, CheckCircle, Search, Filter, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router';
 import { ApiProduct, ApiBrand } from '../types/api';
-import { fetchAllPages } from '../lib/pagination';
+import { fetchAllPages, useInfiniteList } from '../lib/pagination';
+import { LoadMoreSentinel } from '../components/products/LoadMoreSentinel';
 
 const heroImage = 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=1600&h=900&fit=crop';
 
@@ -20,9 +21,9 @@ export function LightFiltersPage() {
   const { language } = useLanguage();
   const tl = (ar: string, en: string) => language === 'ar' ? ar : en;
 
-  const [products, setProducts] = useState<ApiProduct[]>([]);
+  const list = useInfiniteList<ApiProduct>();
+  const { items: products, loading, load } = list;
   const [brands, setBrands] = useState<ApiBrand[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
   const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
@@ -38,23 +39,20 @@ export function LightFiltersPage() {
   }, []);
 
   const fetchProducts = useCallback(() => {
-    setLoading(true);
-    const params: Record<string, string | number> = { category: 'light_filters', page_size: 100 };
+    const params: Record<string, string> = { category: 'light_filters' };
 
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
+    // Lists are sent comma-separated; the API matches any listed value.
+    if (selectedBrands.length) params.brand = selectedBrands.join(',');
+    if (selectedShapes.length) params.frame_shape = selectedShapes.join(',');
     params.ordering = ordering || '-id'; // newest first by default
-    fetchAllPages<ApiProduct>('/api/catalog/products/', params)
-      .then(setProducts)
-      .catch(() => setProducts([]))
-      .finally(() => setLoading(false));
-  }, [minPrice, maxPrice, search, ordering]);
+    load('/api/catalog/products/', params).catch(() => {});
+  }, [load, minPrice, maxPrice, search, selectedBrands, selectedShapes, ordering]);
 
-  // Brand/shape filters run client-side so toggling them does not refetch.
-  const filteredProducts = products.filter(p =>
-    (selectedBrands.length === 0 || (p.brand && selectedBrands.includes(p.brand.id))) &&
-    (selectedShapes.length === 0 || (p.frame_shape && selectedShapes.includes(p.frame_shape))));
+  // No total count from the API: "+" means more products load on scroll.
+  const countLabel = `${products.length}${list.hasMore ? '+' : ''}`;
 
   useEffect(() => {
     const timer = setTimeout(fetchProducts, 300);
@@ -405,7 +403,7 @@ export function LightFiltersPage() {
                     </div>
                   ))}
                 </div>
-              ) : filteredProducts.length > 0 ? (
+              ) : products.length > 0 ? (
                 <>
                   <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="relative flex-1 max-w-md">
@@ -418,14 +416,15 @@ export function LightFiltersPage() {
                       />
                     </div>
                     <p className="text-sm text-muted-foreground whitespace-nowrap">
-                      {tl(`${filteredProducts.length} منتج`, `${filteredProducts.length} products`)}
+                      {tl(`${countLabel} منتج`, `${countLabel} products`)}
                     </p>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-                    {filteredProducts.map(p => (
+                    {products.map(p => (
                       <ApiProductCard key={p.id} product={p} />
                     ))}
                   </div>
+                  <LoadMoreSentinel hasMore={list.hasMore} loading={list.loadingMore} failed={list.loadMoreFailed} onLoadMore={list.loadMore} />
                 </>
               ) : (
                 <div className="text-center py-16 bg-white rounded-lg shadow-md">

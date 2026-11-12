@@ -5,7 +5,9 @@ import { ApiProductCard } from '../components/products/ApiProductCard';
 import { Filter, ChevronDown, Search } from 'lucide-react';
 import { Slider } from '../components/ui/slider';
 import { ApiProduct, ApiBrand } from '../types/api';
-import { fetchAllPages } from '../lib/pagination';
+import api from '../lib/axios';
+import { fetchAllPages, useInfiniteList } from '../lib/pagination';
+import { LoadMoreSentinel } from '../components/products/LoadMoreSentinel';
 import { useRestoreScroll } from '../components/layout/ScrollToTop';
 import { readList, readNumberList, useSyncSearchParams } from '../hooks/useUrlFilters';
 
@@ -52,9 +54,10 @@ export function EyeglassesPage() {
   const [ordering, setOrdering] = useState(() => searchParams.get('sort') ?? '');
   const [showFilters, setShowFilters] = useState(false);
 
-  const [products, setProducts] = useState<ApiProduct[]>([]);
+  const list = useInfiniteList<ApiProduct>();
+  const { items: products, loading, load } = list;
   const [brands, setBrands] = useState<ApiBrand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [colours, setColours] = useState<string[]>([]);
 
   useRestoreScroll(!loading);
 
@@ -90,38 +93,39 @@ export function EyeglassesPage() {
       .catch(() => {});
   }, []);
 
+  // Colour options cover the whole tab, not just the loaded batch.
+  useEffect(() => {
+    const params = isLens ? { category: 'lens' } : { category: 'glasses', lens_type: activeTab };
+    api.get<string[]>('/api/catalog/products/colours/', { params })
+      .then(r => setColours(r.data))
+      .catch(() => setColours([]));
+  }, [activeTab, isLens]);
+
   const fetchProducts = useCallback(() => {
-    setLoading(true);
     // Lenses are their own category; glasses split into medical / sunglasses by lens_type.
-    const params: Record<string, string | number> = isLens
-      ? { category: 'lens', page_size: 100, is_active: 'true' }
-      : { category: 'glasses', lens_type: activeTab, page_size: 100, is_active: 'true' };
+    const params: Record<string, string> = isLens
+      ? { category: 'lens', is_active: 'true' }
+      : { category: 'glasses', lens_type: activeTab, is_active: 'true' };
     if (!isLens && GENDER_MAP[activeGender]) params.gender = GENDER_MAP[activeGender];
     if (minPrice) params.min_price = minPrice;
     if (maxPrice) params.max_price = maxPrice;
     if (search) params.name = search;
+    // Lists are sent comma-separated; the API matches any listed value.
+    if (selectedBrands.length) params.brand = selectedBrands.join(',');
+    if (!isLens && selectedShapes.length) params.frame_shape = selectedShapes.join(',');
+    if (selectedColours.length) params.colour = selectedColours.join(',');
     params.ordering = ordering || '-id'; // newest first by default
-    // Brands and shapes filter client-side below, so toggling them does not refetch.
 
-    fetchAllPages<ApiProduct>('/api/catalog/products/', params)
-      .then(setProducts)
-      .catch(() => setProducts([]))
-      .finally(() => setLoading(false));
-  }, [activeTab, isLens, activeGender, minPrice, maxPrice, search, ordering]);
+    load('/api/catalog/products/', params).catch(() => {});
+  }, [load, activeTab, isLens, activeGender, minPrice, maxPrice, search, selectedBrands, selectedShapes, selectedColours, ordering]);
 
   useEffect(() => {
     const timer = setTimeout(fetchProducts, 300);
     return () => clearTimeout(timer);
   }, [fetchProducts]);
 
-  const uniqueColours = [...new Set(products.flatMap(p => p.images.map(i => i.colour)).filter(Boolean))].sort();
-
-  const filtered = products.filter(p => {
-    if (selectedBrands.length > 0 && !(p.brand && selectedBrands.includes(p.brand.id))) return false;
-    if (!isLens && selectedShapes.length > 0 && !(p.frame_shape && selectedShapes.includes(p.frame_shape))) return false;
-    if (selectedColours.length > 0 && !p.images.some(i => selectedColours.includes(i.colour))) return false;
-    return true;
-  });
+  // No total count from the API: "+" means more products load on scroll.
+  const countLabel = `${products.length}${list.hasMore ? '+' : ''}`;
 
   const toggleBrand = (id: number) =>
     setSelectedBrands(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]);
@@ -335,11 +339,11 @@ export function EyeglassesPage() {
               )}
 
               {/* Colour */}
-              {uniqueColours.length > 0 && (
+              {colours.length > 0 && (
                 <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                   <h3 className="font-bold mb-3 text-sm">{t('اللون', 'Colour')}</h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {uniqueColours.map(colour => (
+                    {colours.map(colour => (
                       <label key={colour} className="flex items-center gap-2 cursor-pointer group">
                         <input
                           type="checkbox"
@@ -374,7 +378,7 @@ export function EyeglassesPage() {
                 />
               </div>
               <p className="text-sm text-muted-foreground whitespace-nowrap">
-                {loading ? t('جارٍ التحميل...', 'Loading...') : t(`${filtered.length} منتج`, `${filtered.length} product${filtered.length !== 1 ? 's' : ''}`)}
+                {loading ? t('جارٍ التحميل...', 'Loading...') : t(`${countLabel} منتج`, `${countLabel} product${countLabel !== '1' ? 's' : ''}`)}
               </p>
             </div>
 
@@ -390,10 +394,13 @@ export function EyeglassesPage() {
                   </div>
                 ))}
               </div>
-            ) : filtered.length > 0 ? (
-              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
-                {filtered.map(p => <ApiProductCard key={p.id} product={p} />)}
-              </div>
+            ) : products.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
+                  {products.map(p => <ApiProductCard key={p.id} product={p} />)}
+                </div>
+                <LoadMoreSentinel hasMore={list.hasMore} loading={list.loadingMore} failed={list.loadMoreFailed} onLoadMore={list.loadMore} />
+              </>
             ) : (
               <div className="text-center py-16">
                 <div className="text-6xl mb-4">👓</div>
