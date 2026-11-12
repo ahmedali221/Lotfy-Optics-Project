@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { useLanguage } from '../../context/LanguageContext';
+import { Dropdown } from '../../components/Dropdown';
 import { Search, Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle } from 'lucide-react';
 import {
   Dialog,
@@ -186,24 +187,20 @@ export function AdminAppointmentsPage() {
                 className="w-full pl-12 pr-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
-            <select
+            <Dropdown
               value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-              className="w-full md:w-48 px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              {statusOptions.map(o => (
-                <option key={o.id} value={o.id}>{language === 'ar' ? o.ar : o.en}</option>
-              ))}
-            </select>
-            <select
+              onChange={setStatusFilter}
+              options={statusOptions.map(o => ({ value: o.id, label: language === 'ar' ? o.ar : o.en }))}
+              className="w-full md:w-48"
+              triggerClassName="px-4 py-3"
+            />
+            <Dropdown
               value={branchFilter}
-              onChange={e => setBranchFilter(e.target.value)}
-              className="w-full md:w-48 px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              {branches.map(o => (
-                <option key={o.id} value={o.id}>{language === 'ar' ? o.ar : o.en}</option>
-              ))}
-            </select>
+              onChange={setBranchFilter}
+              options={branches.map(o => ({ value: o.id, label: language === 'ar' ? o.ar : o.en }))}
+              className="w-full md:w-48"
+              triggerClassName="px-4 py-3"
+            />
           </div>
         </div>
 
@@ -323,28 +320,30 @@ export function AdminAppointmentsPage() {
               <label className="block text-sm font-medium text-secondary mb-1">
                 {language === 'ar' ? 'الفرع' : 'Branch'}
               </label>
-              <select
+              <Dropdown
                 value={form.branch}
-                onChange={e => setForm(f => ({ ...f, branch: e.target.value }))}
-                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-              >
-                <option value="فريال">{language === 'ar' ? 'فريال' : 'Ferial'}</option>
-                <option value="الحقوقيين">{language === 'ar' ? 'الحقوقيين' : 'Hoqoqyin'}</option>
-              </select>
+                onChange={v => setForm(f => ({ ...f, branch: v }))}
+                options={[
+                  { value: 'فريال', label: language === 'ar' ? 'فريال' : 'Ferial' },
+                  { value: 'الحقوقيين', label: language === 'ar' ? 'الحقوقيين' : 'Hoqoqyin' },
+                ]}
+                triggerClassName="py-2"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-secondary mb-1">
                 {language === 'ar' ? 'الحالة' : 'Status'}
               </label>
-              <select
+              <Dropdown<Appointment['status']>
                 value={form.status}
-                onChange={e => setForm(f => ({ ...f, status: e.target.value as Appointment['status'] }))}
-                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-              >
-                <option value="pending">{language === 'ar' ? 'قيد الانتظار' : 'Pending'}</option>
-                <option value="confirmed">{language === 'ar' ? 'مؤكد' : 'Confirmed'}</option>
-                <option value="cancelled">{language === 'ar' ? 'ملغي' : 'Cancelled'}</option>
-              </select>
+                onChange={v => setForm(f => ({ ...f, status: v }))}
+                options={[
+                  { value: 'pending', label: language === 'ar' ? 'قيد الانتظار' : 'Pending' },
+                  { value: 'confirmed', label: language === 'ar' ? 'مؤكد' : 'Confirmed' },
+                  { value: 'cancelled', label: language === 'ar' ? 'ملغي' : 'Cancelled' },
+                ]}
+                triggerClassName="py-2"
+              />
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-4">

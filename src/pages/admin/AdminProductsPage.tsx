@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { useLanguage } from '../../context/LanguageContext';
+import { Dropdown } from '../../components/Dropdown';
 import { 
   Plus, 
   Search, 
@@ -16,6 +17,7 @@ export function AdminProductsPage() {
   const { language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [newProductCategory, setNewProductCategory] = useState('eyeglasses');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -131,17 +133,12 @@ export function AdminProductsPage() {
 
             {/* Category Filter */}
             <div className="w-full md:w-64">
-              <select
+              <Dropdown
                 value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {language === 'ar' ? cat.labelAr : cat.labelEn}
-                  </option>
-                ))}
-              </select>
+                onChange={setCategoryFilter}
+                options={categories.map(cat => ({ value: cat.id, label: language === 'ar' ? cat.labelAr : cat.labelEn }))}
+                triggerClassName="px-4 py-3"
+              />
             </div>
           </div>
         </div>
@@ -301,13 +298,12 @@ export function AdminProductsPage() {
                   <label className="block text-sm font-medium text-secondary mb-2">
                     {language === 'ar' ? 'التصنيف' : 'Category'}
                   </label>
-                  <select className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                    {categories.filter(c => c.id !== 'all').map(cat => (
-                      <option key={cat.id} value={cat.id}>
-                        {language === 'ar' ? cat.labelAr : cat.labelEn}
-                      </option>
-                    ))}
-                  </select>
+                  <Dropdown
+                    value={newProductCategory}
+                    onChange={setNewProductCategory}
+                    options={categories.filter(c => c.id !== 'all').map(cat => ({ value: cat.id, label: language === 'ar' ? cat.labelAr : cat.labelEn }))}
+                    triggerClassName="px-4 py-3"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-secondary mb-2">

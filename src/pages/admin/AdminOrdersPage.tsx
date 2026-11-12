@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { useLanguage } from '../../context/LanguageContext';
+import { Dropdown } from '../../components/Dropdown';
 import { Search, Eye, Trash2, Download, Filter } from 'lucide-react';
 
 export function AdminOrdersPage() {
@@ -170,17 +171,12 @@ export function AdminOrdersPage() {
               />
             </div>
             <div className="w-full md:w-64">
-              <select
+              <Dropdown
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                {statusOptions.map(option => (
-                  <option key={option.id} value={option.id}>
-                    {language === 'ar' ? option.labelAr : option.labelEn}
-                  </option>
-                ))}
-              </select>
+                onChange={setStatusFilter}
+                options={statusOptions.map(option => ({ value: option.id, label: language === 'ar' ? option.labelAr : option.labelEn }))}
+                triggerClassName="px-4 py-3"
+              />
             </div>
           </div>
         </div>
@@ -239,17 +235,15 @@ export function AdminOrdersPage() {
                       {getPaymentMethodText(order.paymentMethod)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <select
+                      <Dropdown
                         value={order.status}
-                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(order.status)}`}
-                      >
-                        {statusOptions.filter(s => s.id !== 'all').map(option => (
-                          <option key={option.id} value={option.id}>
-                            {language === 'ar' ? option.labelAr : option.labelEn}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={v => handleStatusChange(order.id, v)}
+                        options={statusOptions.filter(s => s.id !== 'all').map(option => ({ value: option.id, label: language === 'ar' ? option.labelAr : option.labelEn }))}
+                        hideSelected
+                        menuMinWidth={170}
+                        className="inline-block"
+                        triggerClassName={`w-auto gap-1.5 ps-3 pe-2 py-1 text-xs font-medium rounded-full hover:brightness-95 [&_svg]:w-3.5 [&_svg]:h-3.5 ${getStatusColor(order.status)}`}
+                      />
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-secondary">

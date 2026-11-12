@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { Dropdown } from '../components/Dropdown';
 import { ApiProductCard } from '../components/products/ApiProductCard';
 import { Check, Phone, CheckCircle, Search, Filter, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router';
@@ -285,17 +286,18 @@ export function LightFiltersPage() {
                 {/* Sort */}
                 <div>
                   <label className="block text-sm font-semibold mb-2">{tl('الترتيب', 'Sort By')}</label>
-                  <select
+                  <Dropdown
                     value={ordering}
-                    onChange={e => setOrdering(e.target.value)}
-                    className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  >
-                    <option value="">{tl('الأحدث', 'Newest')}</option>
-                    <option value="price">{tl('السعر: الأقل أولاً', 'Price: Low to High')}</option>
-                    <option value="-price">{tl('السعر: الأعلى أولاً', 'Price: High to Low')}</option>
-                    <option value="name">{tl('الاسم: أ-ي', 'Name: A-Z')}</option>
-                    <option value="-name">{tl('الاسم: ي-أ', 'Name: Z-A')}</option>
-                  </select>
+                    onChange={setOrdering}
+                    options={[
+                      { value: '', label: tl('الأحدث', 'Newest') },
+                      { value: 'price', label: tl('السعر: الأقل أولاً', 'Price: Low to High') },
+                      { value: '-price', label: tl('السعر: الأعلى أولاً', 'Price: High to Low') },
+                      { value: 'name', label: tl('الاسم: أ-ي', 'Name: A-Z') },
+                      { value: '-name', label: tl('الاسم: ي-أ', 'Name: Z-A') },
+                    ]}
+                    triggerClassName="py-2"
+                  />
                 </div>
 
                 {/* Price Range */}

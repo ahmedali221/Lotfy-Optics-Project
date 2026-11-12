@@ -1,4 +1,5 @@
 import { useLanguage } from '../context/LanguageContext';
+import { Dropdown } from '../components/Dropdown';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
@@ -320,10 +321,15 @@ export function CheckoutPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-2"><MapPin className="w-4 h-4 inline me-1" />{t('المحافظة', 'Governorate')} *</label>
-                      <select name="governorate" value={formData.governorate} onChange={handleInputChange} required className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
-                        <option value="">{t('اختر المحافظة', 'Select Governorate')}</option>
-                        {governorates.map(g => <option key={g} value={g}>{g}</option>)}
-                      </select>
+                      <Dropdown
+                        name="governorate"
+                        required
+                        value={formData.governorate}
+                        onChange={v => setFormData({ ...formData, governorate: v })}
+                        placeholder={t('اختر المحافظة', 'Select Governorate')}
+                        options={governorates.map(g => ({ value: g, label: g }))}
+                        triggerClassName="px-4 py-2"
+                      />
                       {formData.governorate && (
                         freeShipping
                           ? <p className="text-xs text-green-600 mt-1">{t('شحن مجاني', 'Free shipping')}</p>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { Dropdown } from '../components/Dropdown';
 import { Check, Phone, Search, Filter, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router';
 import { ApiProduct, ApiBrand } from '../types/api';
@@ -229,12 +230,17 @@ export function ArtificialEyesPage() {
                 {/* Sort */}
                 <div className="bg-white rounded-xl p-5 border border-border shadow-sm">
                   <h3 className="font-bold mb-3 text-sm">{t('ترتيب حسب', 'Sort By')}</h3>
-                  <select value={ordering} onChange={e => setOrdering(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="">{t('الأحدث', 'Newest')}</option>
-                    <option value="price">{t('السعر: الأقل أولاً', 'Price: Low to High')}</option>
-                    <option value="-price">{t('السعر: الأعلى أولاً', 'Price: High to Low')}</option>
-                    <option value="name">{t('الاسم أ-ي', 'Name A-Z')}</option>
-                  </select>
+                  <Dropdown
+                    value={ordering}
+                    onChange={setOrdering}
+                    options={[
+                      { value: '', label: t('الأحدث', 'Newest') },
+                      { value: 'price', label: t('السعر: الأقل أولاً', 'Price: Low to High') },
+                      { value: '-price', label: t('السعر: الأعلى أولاً', 'Price: High to Low') },
+                      { value: 'name', label: t('الاسم أ-ي', 'Name A-Z') },
+                    ]}
+                    triggerClassName="py-2"
+                  />
                 </div>
                 {/* Price Range */}
                 <div className="bg-white rounded-xl p-5 border border-border shadow-sm">

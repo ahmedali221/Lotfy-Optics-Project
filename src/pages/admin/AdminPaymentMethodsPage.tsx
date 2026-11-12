@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { useLanguage } from '../../context/LanguageContext';
+import { Dropdown } from '../../components/Dropdown';
 import { Plus, Edit, Trash2, CreditCard, DollarSign, Smartphone, X, ToggleLeft, ToggleRight } from 'lucide-react';
 
 export function AdminPaymentMethodsPage() {
   const { language } = useLanguage();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [newPaymentType, setNewPaymentType] = useState('credit_card');
 
   const [paymentMethods, setPaymentMethods] = useState([
     {
@@ -288,12 +290,17 @@ export function AdminPaymentMethodsPage() {
                 <label className="block text-sm font-medium text-secondary mb-2">
                   {language === 'ar' ? 'نوع طريقة الدفع' : 'Payment Type'}
                 </label>
-                <select className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                  <option value="credit_card">{language === 'ar' ? 'بطاقة ائتمان' : 'Credit Card'}</option>
-                  <option value="wallet">{language === 'ar' ? 'محفظة إلكترونية' : 'E-Wallet'}</option>
-                  <option value="cash">{language === 'ar' ? 'نقداً' : 'Cash'}</option>
-                  <option value="bank_transfer">{language === 'ar' ? 'تحويل بنكي' : 'Bank Transfer'}</option>
-                </select>
+                <Dropdown
+                  value={newPaymentType}
+                  onChange={setNewPaymentType}
+                  options={[
+                    { value: 'credit_card', label: language === 'ar' ? 'بطاقة ائتمان' : 'Credit Card' },
+                    { value: 'wallet', label: language === 'ar' ? 'محفظة إلكترونية' : 'E-Wallet' },
+                    { value: 'cash', label: language === 'ar' ? 'نقداً' : 'Cash' },
+                    { value: 'bank_transfer', label: language === 'ar' ? 'تحويل بنكي' : 'Bank Transfer' },
+                  ]}
+                  className="w-full"
+                />
               </div>
 
               <div>
